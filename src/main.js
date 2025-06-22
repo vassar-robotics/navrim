@@ -33,7 +33,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
-      webSecurity: true
+      webSecurity: false,
+      allowRunningInsecureContent: true
     },
     icon: path.join(__dirname, '../resources/icon.png'),
     titleBarStyle: 'default',
@@ -41,12 +42,38 @@ function createWindow() {
   });
 
   // Load frontend
-  const indexPath = isDev 
-    ? 'http://localhost:5173'  // Development environment - Vite port (use 5174 if 5173 is occupied)
-    : `file://${path.join(__dirname, '../dist/index.html')}`; // Production environment
-
-  console.log('Loading URL:', indexPath);
-  mainWindow.loadURL(indexPath);
+  if (isDev) {
+    const devUrl = 'http://localhost:5173';
+    console.log('Loading development URL:', devUrl);
+    mainWindow.loadURL(devUrl);
+  } else {
+    const indexFile = path.resolve(__dirname, '../dist/index.html');
+    console.log('Loading production file:', indexFile);
+    console.log('__dirname:', __dirname);
+    console.log('File exists:', require('fs').existsSync(indexFile));
+    
+    // 添加页面加载完成的监听
+    mainWindow.webContents.on('did-finish-load', () => {
+      console.log('Page finished loading');
+      // 注入一些调试代码
+      mainWindow.webContents.executeJavaScript(`
+        console.log('=== Debug Info ===');
+        console.log('Document ready state:', document.readyState);
+        console.log('Root element:', document.getElementById('root'));
+        console.log('Scripts in page:', document.querySelectorAll('script').length);
+        console.log('Module scripts:', Array.from(document.querySelectorAll('script[type="module"]')).map(s => s.src));
+        console.log('=================');
+      `);
+    });
+    
+    // 监听控制台消息
+    mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+      console.log(`Console [${level}]: ${message}`);
+      if (sourceId) console.log(`  Source: ${sourceId}:${line}`);
+    });
+    
+    mainWindow.loadFile(indexFile);
+  }
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -69,10 +96,9 @@ function createWindow() {
     }
   });
 
-  // Open developer tools in development environment
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
+  // 临时在生产模式下也打开开发者工具来调试
+  console.log('Opening DevTools for debugging...');
+  mainWindow.webContents.openDevTools();
 }
 
 // Show setup dialog

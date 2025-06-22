@@ -5,6 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
+    "start:dev": "NODE_ENV=development electron .",
+    "start:prod": "NODE_ENV=production electron .",
     "dev": "NODE_ENV=development npx concurrently \"npm run build-frontend:watch\" \"npx wait-on dist/index.html && electron .\"",
     "build": "npm run build-frontend && electron-builder",
     "build-frontend": "cd frontend && npm run build && cd .. && cp -r frontend/dist/* dist/ || cp -r frontend/build/* dist/ || echo 'No build output found'",
