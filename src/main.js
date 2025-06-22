@@ -245,16 +245,41 @@ ipcMain.handle('get-platform', () => {
 });
 
 ipcMain.handle('choose-install-directory', async () => {
-  const result = await dialog.showOpenDialog(mainWindow, {
-    properties: ['openDirectory'],
-    defaultPath: os.homedir(),
-    title: 'Choose LeRobot Installation Directory'
-  });
-  
-  if (!result.canceled && result.filePaths.length > 0) {
-    return result.filePaths[0];
+  try {
+    console.log('=== Choose Directory Handler ===');
+    console.log('setupWindow exists:', !!setupWindow);
+    console.log('mainWindow exists:', !!mainWindow);
+    
+    // 使用 setupWindow 作为父窗口，如果不存在则使用 mainWindow
+    const parentWindow = setupWindow || mainWindow;
+    
+    if (!parentWindow) {
+      console.error('No parent window available');
+      throw new Error('No parent window available');
+    }
+    
+    console.log('Using parent window:', parentWindow === setupWindow ? 'setupWindow' : 'mainWindow');
+    
+    const result = await dialog.showOpenDialog(parentWindow, {
+      properties: ['openDirectory'],
+      defaultPath: os.homedir(),
+      title: 'Choose LeRobot Installation Directory'
+    });
+    
+    console.log('Dialog result:', result);
+    
+    if (!result.canceled && result.filePaths.length > 0) {
+      const selectedPath = result.filePaths[0];
+      console.log('Selected path:', selectedPath);
+      return selectedPath;
+    }
+    
+    console.log('Dialog was canceled or no path selected');
+    return null;
+  } catch (error) {
+    console.error('Error in choose-install-directory handler:', error);
+    throw error;
   }
-  return null;
 });
 
 ipcMain.handle('setup-lerobot', async (event, installPath) => {

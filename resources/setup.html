@@ -263,14 +263,8 @@
             try {
                 console.log('Preparing to call chooseInstallDirectory...');
                 
-                // Add timeout handling
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('Operation timeout')), 10000);
-                });
-                
-                const choosePromise = window.electronAPI.chooseInstallDirectory();
-                
-                const path = await Promise.race([choosePromise, timeoutPromise]);
+                // 直接调用，不使用超时机制
+                const path = await window.electronAPI.chooseInstallDirectory();
                 
                 console.log('=== Result ===');
                 console.log('Selected path:', path);
@@ -283,10 +277,8 @@
                     document.getElementById('install-path-display').style.display = 'block';
                     document.getElementById('next-btn').disabled = false;
                     console.log('✅ Path setting completed');
-                    alert('Path selected successfully: ' + path);
                 } else {
                     console.log('⚠️ User cancelled selection or returned null');
-                    alert('No path selected');
                 }
             } catch (error) {
                 console.error('=== Error details ===');
