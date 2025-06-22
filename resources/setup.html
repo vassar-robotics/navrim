@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeRobot Backend Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .setup-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 500px;
+            max-width: 90vw;
+        }
+
+        .setup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .setup-header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .setup-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .setup-step {
+            display: none;
+        }
+
+        .setup-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .install-path {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #2c3e50;
+            word-break: break-all;
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 48px;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="setup-header">
+            <h1>LeRobot Backend Setup</h1>
+            <p>Initial setup is required to configure the LeRobot backend environment</p>
+        </div>
+
+        <!-- Step 1: Choose installation directory -->
+        <div class="setup-step active" id="step-1">
+            <div class="form-group">
+                <label for="install-path">Installation Directory</label>
+                <input type="text" id="install-path" readonly placeholder="Click to select installation directory...">
+                <div class="install-path" id="install-path-display" style="display: none;"></div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="chooseDirectory()">Choose Directory</button>
+                <button class="btn btn-secondary" onclick="manualInput()">Manual Input</button>
+                <button class="btn" id="next-btn" onclick="nextStep()" disabled>Next</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Installation progress -->
+        <div class="setup-step" id="step-2">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">Preparing to start installation...</div>
+            </div>
+            
+            <div id="install-details" style="display: none;">
+                <p style="color: #7f8c8d; font-size: 12px; margin-top: 15px;">
+                    This process includes:
+                </p>
+                <ul style="color: #7f8c8d; font-size: 12px; margin-left: 20px; margin-top: 5px;">
+                    <li>Check and install uv Python package manager</li>
+                    <li>Create LeRobot virtual environment</li>
+                    <li>Clone LeRobot code repository</li>
+                    <li>Install Python dependency packages</li>
+                    <li>Configure environment variables</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Step 3: Complete -->
+        <div class="setup-step" id="step-3">
+            <div class="success-icon">✓</div>
+            <div style="text-align: center;">
+                <h2 style="color: #27ae60; margin-bottom: 10px;">Setup Complete!</h2>
+                <p style="color: #7f8c8d; margin-bottom: 20px;">
+                    LeRobot backend has been successfully installed and configured
+                </p>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn" onclick="finishSetup()">Start Using</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedPath = '';
+
+        // Basic test function
+        function testClick() {
+            alert('Test click successful! JavaScript is working.');
+            console.log('Test click was called');
+        }
+
+        // Manual path input
+        function manualInput() {
+            const path = prompt('Please enter LeRobot installation directory path:', '/Users/fany/Desktop/lerobot-install');
+            if (path && path.trim()) {
+                selectedPath = path.trim();
+                document.getElementById('install-path').value = selectedPath;
+                document.getElementById('install-path-display').textContent = selectedPath;
+                document.getElementById('install-path-display').style.display = 'block';
+                document.getElementById('next-btn').disabled = false;
+                console.log('Manually set path:', selectedPath);
+                alert('Path set successfully: ' + selectedPath);
+            }
+        }
+
+        // Choose installation directory
+        async function chooseDirectory() {
+            console.log('=== Choose directory function started ===');
+            
+            if (typeof window.electronAPI === 'undefined') {
+                console.error('electronAPI not found');
+                alert('Error: electronAPI not found');
+                return;
+            }
+            
+            console.log('Available electronAPI methods:', Object.keys(window.electronAPI));
+            
+            if (typeof window.electronAPI.chooseInstallDirectory === 'undefined') {
+                console.error('chooseInstallDirectory method not found');
+                alert('Error: chooseInstallDirectory method not found');
+                return;
+            }
+            
+            try {
+                console.log('Preparing to call chooseInstallDirectory...');
+                
+                // Add timeout handling
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Operation timeout')), 10000);
+                });
+                
+                const choosePromise = window.electronAPI.chooseInstallDirectory();
+                
+                const path = await Promise.race([choosePromise, timeoutPromise]);
+                
+                console.log('=== Result ===');
+                console.log('Selected path:', path);
+                console.log('Path type:', typeof path);
+                
+                if (path) {
+                    selectedPath = path;
+                    document.getElementById('install-path').value = path;
+                    document.getElementById('install-path-display').textContent = path;
+                    document.getElementById('install-path-display').style.display = 'block';
+                    document.getElementById('next-btn').disabled = false;
+                    console.log('✅ Path setting completed');
+                    alert('Path selected successfully: ' + path);
+                } else {
+                    console.log('⚠️ User cancelled selection or returned null');
+                    alert('No path selected');
+                }
+            } catch (error) {
+                console.error('=== Error details ===');
+                console.error('Error type:', error.constructor.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                alert('Error selecting directory: ' + error.message);
+            }
+            
+            console.log('=== Choose directory function ended ===');
+        }
+
+        // Next step
+        function nextStep() {
+            if (currentStep === 1 && selectedPath) {
+                currentStep = 2;
+                showStep(2);
+                startInstallation();
+            }
+        }
+
+        // Show specified step
+        function showStep(step) {
+            document.querySelectorAll('.setup-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+        }
+
+        // Start installation
+        async function startInstallation() {
+            document.getElementById('install-details').style.display = 'block';
+            
+            // Listen to installation progress
+            window.electronAPI.onSetupProgress((data) => {
+                const progressFill = document.getElementById('progress-fill');
+                const progressText = document.getElementById('progress-text');
+                
+                progressFill.style.width = data.progress + '%';
+                progressText.textContent = `Step ${data.step}/5: ${data.message}`;
+                
+                if (data.progress >= 100) {
+                    setTimeout(() => {
+                        currentStep = 3;
+                        showStep(3);
+                    }, 1000);
+                }
+            });
+
+            // Start installation
+            try {
+                const result = await window.electronAPI.setupLerobot(selectedPath);
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                alert('Installation failed: ' + error.message);
+                // Return to first step to reselect directory
+                currentStep = 1;
+                showStep(1);
+            }
+        }
+
+        // Complete setup
+        function finishSetup() {
+            window.close();
+        }
+
+        // Initialization after page load complete
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check if electronAPI is available
+            if (typeof window.electronAPI === 'undefined') {
+                console.error('electronAPI not found!');
+                alert('Error: electronAPI not loaded, please check application configuration.');
+                return;
+            }
+            
+            console.log('electronAPI loaded:', Object.keys(window.electronAPI));
+            
+            // Initialize interface
+            showStep(1);
+        });
+    </script>
+</body>
+</html> 
