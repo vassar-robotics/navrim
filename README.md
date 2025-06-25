@@ -1,4 +1,4 @@
-# Phosphobot LeRobot Desktop
+# Navrim Desktop App
 
 An Electron desktop application that integrates Phosphobot frontend with LeRobot backend.
 
