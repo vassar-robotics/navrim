@@ -26,10 +26,14 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.on('navigate-to', (event, destination: string) => {
+  const currentWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!currentWindow) return;
+
+  currentWindow.loadURL(destination).catch((err) => {
+    console.error('Failed to load:', err);
+    currentWindow.loadURL(resolveHtmlPath('index.html') + '?route=fallback');
+  });
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -86,12 +90,8 @@ const createWindow = async () => {
     },
   });
 
-  // Load from localhost:80
-  mainWindow.loadURL('http://localhost:80').catch((err) => {
-    console.error('Failed to load localhost:80:', err);
-    // Fallback to loading the bundled index.html if the server is not running
-    mainWindow?.loadURL(resolveHtmlPath('index.html'));
-  });
+  // Load the welcome page
+  mainWindow.loadURL(resolveHtmlPath('index.html') + '?route=welcome');
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -129,9 +129,9 @@ const createWindow = async () => {
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  // if (process.platform !== 'darwin') {
+  app.quit();
+  // }
 });
 
 app
