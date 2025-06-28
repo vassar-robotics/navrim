@@ -13,44 +13,6 @@ body {
   padding: 0;
 }
 
-.fallback-container {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #FBFBFA;
-}
-
-.fallback-content {
-  text-align: center;
-  padding: 40px;
-  max-width: 400px;
-}
-
-.fallback-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-  filter: grayscale(20%);
-}
-
-.fallback-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #37352F;
-  margin: 0 0 12px 0;
-  letter-spacing: -0.02em;
-}
-
-.fallback-message {
-  font-size: 16px;
-  font-weight: 400;
-  color: #787774;
-  margin: 0;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
-}
-
 button {
   background-color: white;
   padding: 10px 20px;

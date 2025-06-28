@@ -86,7 +86,7 @@ const createWindow = async () => {
     },
   });
 
-  // Load from localhost:5173
+  // Load from localhost:80
   mainWindow.loadURL('http://localhost:80').catch((err) => {
     console.error('Failed to load localhost:80:', err);
     // Fallback to loading the bundled index.html if the server is not running
