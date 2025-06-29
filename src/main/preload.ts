@@ -2,7 +2,14 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'navigate-to';
+export type Channels =
+  | 'navigate-to'
+  | 'install-uv'
+  | 'install-phosphobot'
+  | 'install-lerobot'
+  | 'installation-progress'
+  | 'launch-backend'
+  | 'check-port';
 
 const electronHandler = {
   ipcRenderer: {
@@ -20,6 +27,9 @@ const electronHandler = {
     },
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
+    },
+    invoke(channel: Channels, ...args: unknown[]) {
+      return ipcRenderer.invoke(channel, ...args);
     },
   },
   navigateTo: (path: string) => {

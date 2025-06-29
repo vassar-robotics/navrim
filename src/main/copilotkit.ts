@@ -1,10 +1,11 @@
-import { createServer } from 'node:http';
+import { createServer } from "node:http";
 import {
   CopilotRuntime,
-  OpenAIAdapter,
   copilotRuntimeNodeHttpEndpoint,
-} from '@copilotkit/runtime';
-import OpenAI from 'openai';
+  OpenAIAdapter,
+} from "@copilotkit/runtime";
+import process from "node:process";
+import OpenAI from "openai";
 
 export function startCopilotKitServer() {
   const openai = new OpenAI({
@@ -15,12 +16,12 @@ export function startCopilotKitServer() {
   const server = createServer((req, res) => {
     const runtime = new CopilotRuntime({
       remoteEndpoints: [
-        { url: 'http://localhost:80/chat/tools' }
+        { url: "http://localhost:80/chat/tools" },
       ],
     });
 
     const handler = copilotRuntimeNodeHttpEndpoint({
-      endpoint: '/chat/copilotkit',
+      endpoint: "/chat/copilotkit",
       runtime,
       serviceAdapter,
     });
@@ -29,6 +30,6 @@ export function startCopilotKitServer() {
   });
 
   server.listen(5175, () => {
-    console.log('Listening at http://localhost:5175/chat/copilotkit');
+    console.log("Listening at http://localhost:5175/chat/copilotkit");
   });
 }

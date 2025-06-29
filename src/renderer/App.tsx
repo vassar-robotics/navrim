@@ -2,8 +2,8 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
-import FallbackPage from './pages/FallbackPage';
-import WelcomePage from './pages/WelcomePage';
+import FallbackPage from './pages/FallbackPage.tsx';
+import WelcomePage from './pages/WelcomePage.tsx';
 
 function AppRoutes() {
   const navigate = useNavigate();
