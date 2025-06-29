@@ -31,7 +31,14 @@ const configuration: webpack.Configuration = {
   module: require('./webpack.config.renderer.dev').default.module,
 
   entry: {
-    renderer: Object.keys(dependencies || {}),
+    renderer: Object.keys(dependencies || {}).filter(
+      (dep) =>
+        // Exclude Tailwind CSS and its native dependencies
+        !dep.includes('@tailwindcss') &&
+        dep !== 'lightningcss' &&
+        dep !== 'postcss' &&
+        dep !== 'postcss-loader'
+    ),
   },
 
   output: {

@@ -1,4 +1,4 @@
-import { exec, spawn, ChildProcess } from "child_process";
+import { ChildProcess, exec, spawn } from "child_process";
 import { app } from "electron";
 import fs from "fs";
 import { platform } from "os";
@@ -115,17 +115,20 @@ export default class Backend {
         ? path.join(this.venvDir, "Scripts", "python.exe")
         : path.join(this.venvDir, "bin", "python");
 
+      const uvExec = await this.which("uv");
+
+
       if (!fs.existsSync(venvPython)) {
         // Create the virtual environment
-        await aexec(`uv venv "${this.venvDir}"`);
+        await aexec(`${uvExec} venv "${this.venvDir}"`);
       }
 
       // Install navrim-phosphobot in the venv
-      await aexec(`uv pip install navrim-phosphobot`, {
+      await aexec(`${uvExec} pip install navrim-phosphobot`, {
         env: {
           ...process.env,
           VIRTUAL_ENV: this.venvDir,
-        }
+        },
       });
 
       return {
@@ -164,17 +167,19 @@ export default class Backend {
         ? path.join(this.venvDir, "Scripts", "python.exe")
         : path.join(this.venvDir, "bin", "python");
 
+      const uvExec = await this.which("uv");
+
       if (!fs.existsSync(venvPython)) {
         // Create the virtual environment
-        await aexec(`uv venv "${this.venvDir}"`);
+        await aexec(`${uvExec} venv "${this.venvDir}"`);
       }
 
       // Install navrim-lerobot in the venv
-      await aexec(`uv pip install navrim-lerobot`, {
+      await aexec(`${uvExec} pip install navrim-lerobot`, {
         env: {
           ...process.env,
           VIRTUAL_ENV: this.venvDir,
-        }
+        },
       });
 
       return {
@@ -208,7 +213,8 @@ export default class Backend {
       if (!fs.existsSync(phosphobotExe)) {
         return {
           success: false,
-          message: "phosphobot executable not found. Please install phosphobot first.",
+          message:
+            "phosphobot executable not found. Please install phosphobot first.",
         };
       }
 
@@ -340,17 +346,31 @@ export default class Backend {
     });
   }
 
+  private async which(command: string): Promise<string | null> {
+    const checkCmd = this.platform === "win32"
+      ? `where ${command}`
+      : `which ${command}`;
+    const possibleUsefulPaths = [
+      "/usr/local/bin",
+      "/usr/bin",
+      "/bin",
+      "/usr/sbin",
+      "/sbin",
+      path.join(this.homeDir, ".local", "bin"),
+    ];
+    const result = await aexec(checkCmd, {
+      env: { PATH: possibleUsefulPaths.join(":") },
+    });
+    return result.stdout.trim();
+  }
+
   /**
    * Helper method to check if a command exists
    */
   private async checkCommand(command: string): Promise<boolean> {
     try {
-      const checkCmd = this.platform === "win32"
-        ? `where ${command}`
-        : `which ${command}`;
-
-      await aexec(checkCmd);
-      return true;
+      const result = await this.which(command);
+      return result !== null && result !== "" && result !== undefined;
     } catch {
       return false;
     }
