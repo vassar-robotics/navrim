@@ -2,12 +2,6 @@
 logs
 *.log
 
-# Release
-release/
-
-# Virtual Environment
-.venv/
-
 # Runtime data
 pids
 *.pid
