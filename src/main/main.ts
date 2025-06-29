@@ -10,20 +10,15 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
+const todesktop = require("@todesktop/runtime");
+
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { startCopilotKitServer } from './copilotkit';
 import { EnvironmentManager } from './environment';
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+todesktop.init();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -52,17 +47,17 @@ ipcMain.handle('create-env', async () => {
   }
 });
 
-ipcMain.handle('env-status', async () => {
-  return envManager.checkEnvironmentReady();
-});
-
-ipcMain.handle('setup-environment', async () => {
+ipcMain.handle('install-package', async (event, packageName?: string) => {
   try {
-    await envManager.setupEnvironment();
+    await envManager.installPackage(packageName);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
+});
+
+ipcMain.handle('env-status', async () => {
+  return envManager.checkEnvironmentReady();
 });
 
 ipcMain.handle('run-phosphobot', async () => {
@@ -124,7 +119,7 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
       // Enable web security settings for loading external content
       webSecurity: true,
-      nodeIntegration: false,
+      nodeIntegration: true,
       contextIsolation: true,
     },
   });
@@ -160,9 +155,6 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**

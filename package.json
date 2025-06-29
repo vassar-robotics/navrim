@@ -99,6 +99,8 @@
   "dependencies": {
     "@copilotkit/runtime": "^1.9.1",
     "@electron/notarize": "^3.0.0",
+    "@todesktop/cli": "^1.15.1",
+    "@todesktop/runtime": "^1.1.0",
     "electron-debug": "^4.1.0",
     "electron-log": "^5.3.2",
     "electron-updater": "^6.3.9",
