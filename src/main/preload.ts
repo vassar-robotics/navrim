@@ -2,11 +2,11 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels =
-  | 'ipc-example'
-  | 'check-uv'
-  | 'install-uv'
-  | 'create-env'
+export type Channels = 
+  | 'ipc-example' 
+  | 'check-uv' 
+  | 'install-uv' 
+  | 'create-env' 
   | 'env-status'
   | 'setup-environment'
   | 'run-phosphobot';

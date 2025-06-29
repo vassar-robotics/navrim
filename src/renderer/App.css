@@ -2,8 +2,6 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-@import "tailwindcss";
-
 body {
   position: relative;
   color: #37352F;
@@ -13,4 +11,84 @@ body {
   overflow-y: hidden;
   margin: 0;
   padding: 0;
+}
+
+.fallback-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FBFBFA;
+}
+
+.fallback-content {
+  text-align: center;
+  padding: 40px;
+  max-width: 400px;
+}
+
+.fallback-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  filter: grayscale(20%);
+}
+
+.fallback-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #37352F;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
+}
+
+.fallback-message {
+  font-size: 16px;
+  font-weight: 400;
+  color: #787774;
+  margin: 0;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+button {
+  background-color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  appearance: none;
+  font-size: 1.3rem;
+  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
+    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
+  transition: all ease-in 0.1s;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+button:hover {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  height: fit-content;
+  width: fit-content;
+  margin: 10px;
+}
+
+a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.Hello {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
 }

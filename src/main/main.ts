@@ -70,22 +70,22 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-if (process.env.NODE_ENV === "production") {
-  const sourceMapSupport = require("source-map-support");
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
 
-const isDebug = process.env.NODE_ENV === "development" ||
-  process.env.DEBUG_PROD === "true";
+const isDebug =
+  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 if (isDebug) {
-  require("electron-debug").default();
+  require('electron-debug').default();
 }
 
-const installExtensions = () => {
-  const installer = require("electron-devtools-installer");
+const installExtensions = async () => {
+  const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ["REACT_DEVELOPER_TOOLS"];
+  const extensions = ['REACT_DEVELOPER_TOOLS'];
 
   return installer
     .default(
@@ -101,8 +101,8 @@ const createWindow = async () => {
   }
 
   const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, "assets")
-    : path.join(__dirname, "../../assets");
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets');
 
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
@@ -112,11 +112,11 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
-    icon: getAssetPath("icon.png"),
+    icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
-        ? path.join(__dirname, "preload.js")
-        : path.join(__dirname, "../../.erb/dll/preload.js"),
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
       // Enable web security settings for loading external content
       webSecurity: true,
       nodeIntegration: true,
@@ -131,7 +131,7 @@ const createWindow = async () => {
     mainWindow?.loadURL(resolveHtmlPath('index.html'));
   });
 
-  mainWindow.on("ready-to-show", () => {
+  mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
@@ -142,7 +142,7 @@ const createWindow = async () => {
     }
   });
 
-  mainWindow.on("closed", () => {
+  mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
@@ -152,7 +152,7 @@ const createWindow = async () => {
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
-    return { action: "deny" };
+    return { action: 'deny' };
   });
 
 };
@@ -164,16 +164,12 @@ const createWindow = async () => {
 app.on('window-all-closed', () => {
   // Stop phosphobot when closing the app
   envManager.stopPhosphobot();
-
+  
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  // if (process.platform !== 'darwin') {
-  app.quit();
-  // }
-});
-
-app.on("before-quit", async (event) => {
-  app.exit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('before-quit', () => {
@@ -186,7 +182,7 @@ app
   .then(() => {
     createWindow();
     startCopilotKitServer();
-    app.on("activate", () => {
+    app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();

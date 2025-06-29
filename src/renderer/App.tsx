@@ -51,10 +51,10 @@ function EnvironmentSetup() {
         await setupEnvironment(envStatus);
       }
     } catch (error: any) {
-      setProgress(prev => ({
-        ...prev,
-        checking: false,
-        error: error.message || 'Error checking environment'
+      setProgress(prev => ({ 
+        ...prev, 
+        checking: false, 
+        error: error.message || 'Error checking environment' 
       }));
     }
   };
@@ -62,21 +62,21 @@ function EnvironmentSetup() {
   const setupEnvironment = async (envStatus: EnvironmentStatus) => {
     try {
       // Call backend's setupEnvironment method
-      setProgress(prev => ({
-        ...prev,
+      setProgress(prev => ({ 
+        ...prev, 
         installingUv: !envStatus.uvInstalled,
         creatingEnv: !envStatus.envExists,
         installingPackage: !envStatus.packageInstalled
       }));
-
+      
       const result = await window.electron.ipcRenderer.invoke('setup-environment');
-
+      
       if (!result.success) {
         throw new Error(result.error || 'Failed to setup environment');
       }
-
-      setProgress(prev => ({
-        ...prev,
+      
+      setProgress(prev => ({ 
+        ...prev, 
         installingUv: false,
         creatingEnv: false,
         installingPackage: false
@@ -91,12 +91,12 @@ function EnvironmentSetup() {
         await startPhosphobot();
       }
     } catch (error: any) {
-      setProgress(prev => ({
-        ...prev,
+      setProgress(prev => ({ 
+        ...prev, 
         installingUv: false,
         creatingEnv: false,
         installingPackage: false,
-        error: error.message || 'Error setting up environment'
+        error: error.message || 'Error setting up environment' 
       }));
     }
   };
@@ -122,7 +122,7 @@ function EnvironmentSetup() {
       if (isAvailable) {
         return true;
       }
-
+      
       // Wait 1 second before next check
       await new Promise(resolve => setTimeout(resolve, 1000));
       attempts++;
@@ -135,7 +135,7 @@ function EnvironmentSetup() {
     try {
       setProgress(prev => ({ ...prev, startingPhosphobot: true }));
       const result = await window.electron.ipcRenderer.invoke('run-phosphobot');
-
+      
       if (!result.success) {
         throw new Error(result.error || 'Failed to start phosphobot');
       }
@@ -144,21 +144,21 @@ function EnvironmentSetup() {
 
       // Wait for service to be available
       const serviceReady = await waitForService();
-
+      
       if (!serviceReady) {
         throw new Error('Service failed to start within 60 seconds');
       }
 
       setProgress(prev => ({ ...prev, waitingForService: false }));
-
+      
        // Navigate to localhost:80
       window.location.href = 'http://localhost:80';
     } catch (error: any) {
-      setProgress(prev => ({
-        ...prev,
+      setProgress(prev => ({ 
+        ...prev, 
         startingPhosphobot: false,
         waitingForService: false,
-        error: error.message || 'Error starting phosphobot'
+        error: error.message || 'Error starting phosphobot' 
       }));
     }
   };
@@ -171,33 +171,33 @@ function EnvironmentSetup() {
     if (progress.startingPhosphobot) return 'Starting phosphobot...';
     if (progress.waitingForService) return 'Waiting for service to be ready...';
     if (progress.error) return `Error: ${progress.error}`;
-
+    
     if (status) {
       if (!status.uvInstalled) return 'uv needs to be installed';
       if (!status.envExists) return 'Virtual environment needs to be created';
       if (!status.packageInstalled) return 'navrim-phosphobot and navrim-lerobot needs to be installed';
       return 'Environment is ready';
     }
-
+    
     return 'Preparing...';
   };
 
-  const isLoading = progress.checking || progress.installingUv ||
-                   progress.creatingEnv || progress.installingPackage ||
+  const isLoading = progress.checking || progress.installingUv || 
+                   progress.creatingEnv || progress.installingPackage || 
                    progress.startingPhosphobot || progress.waitingForService;
 
   return (
     <div className="fallback-container">
       <div className="fallback-content">
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
           alignItems: 'center',
           marginBottom: '20px'
         }}>
-          <img
+          <img 
             src={logoImg}
-            alt="Logo"
+            alt="Logo" 
             style={{
               height: '60px',
               width: 'auto',
@@ -205,9 +205,9 @@ function EnvironmentSetup() {
             }}
           />
         </div>
-        <div className="fallback-icon" style={{
-          display: 'flex',
-          justifyContent: 'center',
+        <div className="fallback-icon" style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
           alignItems: 'center',
           height: '72px',
           marginBottom: '20px'
@@ -230,7 +230,7 @@ function EnvironmentSetup() {
         <p className="fallback-message">
           {getProgressMessage()}
         </p>
-
+        
         {/* Show detailed status */}
         {status && !isLoading && !progress.error && (
           <div style={{ marginTop: '20px', fontSize: '14px', color: '#787774' }}>
@@ -242,7 +242,7 @@ function EnvironmentSetup() {
 
         {/* Show retry button on error */}
         {progress.error && (
-          <button
+          <button 
             onClick={checkAndSetupEnvironment}
             style={{ marginTop: '20px' }}
           >
@@ -250,7 +250,7 @@ function EnvironmentSetup() {
           </button>
         )}
       </div>
-
+      
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
