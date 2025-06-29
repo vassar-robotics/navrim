@@ -1,47 +1,223 @@
-name: Publish
+name: Build and Release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  publish:
-    # To enable auto publishing to github, update your electron publisher
-    # config in package.json > "build" and remove the conditional below
-    if: ${{ github.repository_owner == 'electron-react-boilerplate' }}
-
-    runs-on: ${{ matrix.os }}
-
+  build:
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [macos-latest, windows-latest]
+        include:
+          - os: macos-latest
+            name: macOS
+            artifact: '*.dmg'
+          - os: windows-latest
+            name: Windows
+            artifact: '*.exe'
 
+    runs-on: ${{ matrix.os }}
+    
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: 20
 
-      - name: Install and build
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
         run: |
-          npm install
-          npm run postinstall
-          npm run build
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: Publish releases
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # macOS certificate configuration (optional)
+      - name: Setup macOS certificates
+        if: matrix.os == 'macos-latest'
         env:
-          # The APPLE_* values are used for auto updates signing
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASS }}
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Skip if certificate is not provided
+          if [ -z "$MACOS_CERTIFICATE" ]; then
+            echo "No macOS certificate provided, skipping signing setup"
+            exit 0
+          fi
+
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Import certificate from base64
+          echo -n "$MACOS_CERTIFICATE" | base64 --decode -o $CERTIFICATE_PATH
+
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$MACOS_CERTIFICATE_PWD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+      # Windows certificate configuration (if needed)
+      - name: Setup Windows certificates
+        if: matrix.os == 'windows-latest' && env.WINDOWS_CERTIFICATE != ''
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PWD: ${{ secrets.WINDOWS_CERTIFICATE_PWD }}
+        run: |
+          $certificatePath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "cert.pfx"
+          [System.Convert]::FromBase64String($env:WINDOWS_CERTIFICATE) | Set-Content $certificatePath -Encoding Byte
+          
+          # Import certificate to Windows certificate store
+          $SecurePassword = ConvertTo-SecureString $env:WINDOWS_CERTIFICATE_PWD -AsPlainText -Force
+          Import-PfxCertificate -FilePath $certificatePath -CertStoreLocation Cert:\CurrentUser\My -Password $SecurePassword
+        shell: pwsh
+
+      # Build application
+      # Note: Without certificates, the app will be built but not signed
+      - name: Build Electron app
+        env:
+          # macOS notarization credentials (optional)
           APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          # This is used for uploading release assets to github
+          # Windows signing credentials (optional) - only set if certificate exists
+          WIN_CSC_LINK: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PWD }}
+          # Release configuration
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm exec electron-builder -- --publish always --win --mac --linux
+          # Clean dist directory
+          npx ts-node ./.erb/scripts/clean.js dist
+          
+          # Build the application
+          pnpm run build
+          
+          # Build with electron-builder
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            if [ -n "${{ secrets.MACOS_CERTIFICATE }}" ]; then
+              echo "Building with code signing for macOS"
+              export CSC_LINK="${{ secrets.MACOS_CERTIFICATE }}"
+              export CSC_KEY_PASSWORD="${{ secrets.MACOS_CERTIFICATE_PWD }}"
+              npx electron-builder build --mac --publish never
+            else
+              echo "Building with ad-hoc signing for macOS"
+              # Create a temporary package.json without notarization configs
+              cp package.json package.json.backup
+              node -e "
+                const pkg = require('./package.json');
+                delete pkg.build.afterSign;
+                pkg.build.mac.identity = '-';  // Use ad-hoc signing
+                pkg.build.mac.notarize = false;
+                require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+              "
+              npx electron-builder build --mac --publish never
+              # Restore original package.json
+              mv package.json.backup package.json
+            fi
+          elif [ "${{ matrix.os }}" = "windows-latest" ]; then
+            if [ -n "${{ secrets.WINDOWS_CERTIFICATE }}" ]; then
+              echo "Building with code signing for Windows"
+              export CSC_LINK="${{ secrets.WINDOWS_CERTIFICATE }}"
+              export CSC_KEY_PASSWORD="${{ secrets.WINDOWS_CERTIFICATE_PWD }}"
+              npx electron-builder build --win --publish never
+            else
+              echo "Building without code signing for Windows"
+              export CSC_IDENTITY_AUTO_DISCOVERY=false
+              npx electron-builder build --win --publish never
+            fi
+          fi
+          
+          # Build DLL
+          pnpm run build:dll
+        shell: bash
+
+      # Clean up macOS keychain
+      - name: Clean up macOS keychain
+        if: matrix.os == 'macos-latest' && always()
+        run: |
+          if [ -f "$RUNNER_TEMP/app-signing.keychain-db" ]; then
+            security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
+          fi
+
+      # Upload build artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-build
+          path: |
+            release/build/${{ matrix.artifact }}
+          retention-days: 30
+
+  # Upload artifacts to existing release
+  upload-release-assets:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          # Don't create a new release, just upload to existing one
+          fail_on_unmatched_files: false
+          files: |
+            artifacts/**/*.dmg
+            artifacts/**/*.exe
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Optional: Publish to update server
+  # publish-update:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: startsWith(github.ref, 'refs/tags/')
+    
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Download all artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         path: ./artifacts
+
+      # If you use a custom update server, upload here
+      # - name: Upload to update server
+      #   run: |
+      #     # Upload logic
