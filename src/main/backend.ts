@@ -195,6 +195,14 @@ export default class Backend {
 
   async launch(): Promise<BackendStatus> {
     try {
+      // Check if USE_LOCAL_BACKEND is set
+      if (process.env.USE_LOCAL_BACKEND) {
+        return {
+          success: true,
+          message: "Skipping backend launch - USE_LOCAL_BACKEND is set",
+        };
+      }
+
       // Check if phosphobot is already running
       if (this.phosphobotProcess && !this.phosphobotProcess.killed) {
         return {
