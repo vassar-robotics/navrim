@@ -117,7 +117,6 @@ export default class Backend {
 
       const uvExec = await this.which("uv");
 
-
       if (!fs.existsSync(venvPython)) {
         // Create the virtual environment
         await aexec(`${uvExec} venv "${this.venvDir}"`);

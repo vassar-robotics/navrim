@@ -4,7 +4,7 @@ import {
   InstallationProgress,
   IPCChannels,
   PortCheckResult,
-} from "../../types/ipc.ts";
+} from "../../types/ipc";
 
 interface Step {
   id: number;
