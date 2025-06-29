@@ -8,28 +8,67 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from "path";
-import { app, BrowserWindow, ipcMain, shell } from "electron";
-import { autoUpdater } from "electron-updater";
-import log from "electron-log";
-import MenuBuilder from "./menu.ts";
-import { resolveHtmlPath } from "./util.ts";
-import { startCopilotKitServer } from "./copilotkit.ts";
-import process from "node:process";
-import IPCRegistry from "./ipc.ts";
-import Backend from "./backend.ts";
+import path from 'path';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
+const todesktop = require("@todesktop/runtime");
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = "info";
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+import log from 'electron-log';
+import MenuBuilder from './menu';
+import { resolveHtmlPath } from './util';
+import { startCopilotKitServer } from './copilotkit';
+import { EnvironmentManager } from './environment';
+
+todesktop.init();
 
 let mainWindow: BrowserWindow | null = null;
 
-new IPCRegistry().registerAll();
+// Register environment management IPC handlers
+const envManager = EnvironmentManager.getInstance();
+
+ipcMain.handle('check-uv', async () => {
+  return envManager.checkUvInstalled();
+});
+
+ipcMain.handle('install-uv', async () => {
+  try {
+    await envManager.installUv();
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('create-env', async () => {
+  try {
+    await envManager.createVirtualEnvironment();
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('install-package', async (event, packageName?: string) => {
+  try {
+    await envManager.installPackage(packageName);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('env-status', async () => {
+  return envManager.checkEnvironmentReady();
+});
+
+ipcMain.handle('run-phosphobot', async () => {
+  return envManager.runPhosphobot();
+});
+
+ipcMain.on('ipc-example', async (event, arg) => {
+  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+  console.log(msgTemplate(arg));
+  event.reply('ipc-example', msgTemplate('pong'));
+});
 
 if (process.env.NODE_ENV === "production") {
   const sourceMapSupport = require("source-map-support");
@@ -80,13 +119,17 @@ const createWindow = async () => {
         : path.join(__dirname, "../../.erb/dll/preload.js"),
       // Enable web security settings for loading external content
       webSecurity: true,
-      nodeIntegration: false,
+      nodeIntegration: true,
       contextIsolation: true,
     },
   });
 
-  // Load the welcome page
-  mainWindow.loadURL(resolveHtmlPath("index.html") + "?route=welcome");
+  // Load from localhost:80
+  mainWindow.loadURL('http://localhost:80').catch((err) => {
+    console.error('Failed to load localhost:80:', err);
+    // Fallback to loading the bundled index.html if the server is not running
+    mainWindow?.loadURL(resolveHtmlPath('index.html'));
+  });
 
   mainWindow.on("ready-to-show", () => {
     if (!mainWindow) {
@@ -112,16 +155,16 @@ const createWindow = async () => {
     return { action: "deny" };
   });
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**
  * Add event listeners...
  */
 
-app.on("window-all-closed", () => {
+app.on('window-all-closed', () => {
+  // Stop phosphobot when closing the app
+  envManager.stopPhosphobot();
+
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   // if (process.platform !== 'darwin') {
@@ -130,16 +173,12 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", async (event) => {
-  event.preventDefault();
-  try {
-    // Cleanup Backend instance (stops phosphobot if running)
-    await Backend.getInstance().cleanup();
-    console.log("Backend cleanup completed");
-  } catch (error) {
-    console.error("Error during backend cleanup:", error);
-  } finally {
-    app.exit();
-  }
+  app.exit();
+});
+
+app.on('before-quit', () => {
+  // Ensure phosphobot is stopped before quitting
+  envManager.stopPhosphobot();
 });
 
 app

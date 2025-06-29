@@ -3,13 +3,13 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
-  | 'navigate-to'
+  | 'ipc-example'
+  | 'check-uv'
   | 'install-uv'
-  | 'install-phosphobot'
-  | 'install-lerobot'
-  | 'installation-progress'
-  | 'launch-backend'
-  | 'check-port';
+  | 'create-env'
+  | 'env-status'
+  | 'setup-environment'
+  | 'run-phosphobot';
 
 const electronHandler = {
   ipcRenderer: {
@@ -28,12 +28,9 @@ const electronHandler = {
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
-    invoke(channel: Channels, ...args: unknown[]) {
+    invoke(channel: Channels, ...args: unknown[]): Promise<any> {
       return ipcRenderer.invoke(channel, ...args);
     },
-  },
-  navigateTo: (path: string) => {
-    ipcRenderer.send('navigate-to', path);
   },
 };
 
