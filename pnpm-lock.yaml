@@ -35,6 +35,9 @@ importers:
       react-router-dom:
         specifier: ^7.3.0
         version: 7.6.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      source-map-support:
+        specifier: ^0.5.21
+        version: 0.5.21
     devDependencies:
       '@electron/rebuild':
         specifier: ^3.7.1
@@ -14031,7 +14034,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.10.0)
+      retry-axios: 2.6.0(axios@1.10.0(debug@4.4.1))
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -16057,7 +16060,7 @@ snapshots:
       onetime: 5.1.2
       signal-exit: 3.0.7
 
-  retry-axios@2.6.0(axios@1.10.0):
+  retry-axios@2.6.0(axios@1.10.0(debug@4.4.1)):
     dependencies:
       axios: 1.10.0(debug@4.4.1)
 
