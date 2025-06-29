@@ -2,7 +2,14 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'ipc-example';
+export type Channels = 
+  | 'ipc-example' 
+  | 'check-uv' 
+  | 'install-uv' 
+  | 'create-env' 
+  | 'install-package'
+  | 'env-status'
+  | 'run-phosphobot';
 
 const electronHandler = {
   ipcRenderer: {
@@ -20,6 +27,9 @@ const electronHandler = {
     },
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
+    },
+    invoke(channel: Channels, ...args: unknown[]): Promise<any> {
+      return ipcRenderer.invoke(channel, ...args);
     },
   },
 };
