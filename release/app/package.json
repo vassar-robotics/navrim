@@ -1,17 +1,12 @@
 {
-  "name": "navrim",
-  "version": "0.1.0",
-  "description": "Navrim - A desktop application for phosphobot",
+  "name": "electron-react-boilerplate",
+  "version": "4.6.0",
+  "description": "A foundation for scalable desktop apps",
   "license": "MIT",
   "author": {
-    "name": "Navrim Team",
-    "email": "support@navrim.com",
-    "url": "https://github.com/navrim/navrim"
-  },
-  "homepage": "https://github.com/navrim/navrim",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/navrim/navrim.git"
+    "name": "Electron React Boilerplate Maintainers",
+    "email": "electronreactboilerplate@gmail.com",
+    "url": "https://github.com/electron-react-boilerplate"
   },
   "main": "./dist/main/main.js",
   "scripts": {

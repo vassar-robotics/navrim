@@ -1,26 +1,30 @@
 {
-  "name": "navrim",
-  "version": "0.1.0",
-  "description": "Navrim - A desktop application for phosphobot",
+  "name": "electron-react-boilerplate",
+  "description": "A foundation for scalable desktop apps",
   "keywords": [
-    "navrim",
-    "phosphobot",
     "electron",
-    "desktop",
-    "app"
+    "boilerplate",
+    "react",
+    "typescript",
+    "ts",
+    "sass",
+    "webpack",
+    "hot",
+    "reload"
   ],
-  "homepage": "https://github.com/navrim/navrim",
+  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
   "bugs": {
-    "url": "https://github.com/navrim/navrim/issues"
+    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/navrim/navrim.git"
+    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
   },
   "license": "MIT",
   "author": {
-    "name": "Navrim Team",
-    "email": "support@navrim.com"
+    "name": "Electron React Boilerplate Maintainers",
+    "email": "electronreactboilerplate@gmail.com",
+    "url": "https://electron-react-boilerplate.js.org"
   },
   "contributors": [
     {
@@ -174,8 +178,8 @@
     "webpack-merge": "^6.0.1"
   },
   "build": {
-    "productName": "Navrim",
-    "appId": "com.navrim.app",
+    "productName": "ElectronReact",
+    "appId": "org.erb.ElectronReact",
     "asar": true,
     "afterSign": ".erb/scripts/notarize.js",
     "asarUnpack": "**\\*.{node,dll}",
@@ -197,8 +201,7 @@
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false,
-      "icon": "assets/icon.icns"
+      "gatekeeperAssess": false
     },
     "dmg": {
       "contents": [
@@ -212,28 +215,18 @@
           "type": "link",
           "path": "/Applications"
         }
-      ],
-      "icon": "assets/icon.icns"
+      ]
     },
     "win": {
       "target": [
         "nsis"
-      ],
-      "icon": "assets/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      ]
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb"
+        "AppImage"
       ],
-      "category": "Development",
-      "icon": "assets/icons"
+      "category": "Development"
     },
     "directories": {
       "app": "release/app",
@@ -242,7 +235,12 @@
     },
     "extraResources": [
       "./assets/**"
-    ]
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "electron-react-boilerplate",
+      "repo": "electron-react-boilerplate"
+    }
   },
   "collective": {
     "url": "https://opencollective.com/electron-react-boilerplate-594"

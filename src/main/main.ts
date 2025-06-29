@@ -15,7 +15,6 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { startCopilotKitServer } from './copilotkit';
-import { EnvironmentManager } from './environment';
 
 class AppUpdater {
   constructor() {
@@ -26,48 +25,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-// Register environment management IPC handlers
-const envManager = EnvironmentManager.getInstance();
-
-ipcMain.handle('check-uv', async () => {
-  return envManager.checkUvInstalled();
-});
-
-ipcMain.handle('install-uv', async () => {
-  try {
-    await envManager.installUv();
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
-  }
-});
-
-ipcMain.handle('create-env', async () => {
-  try {
-    await envManager.createVirtualEnvironment();
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
-  }
-});
-
-ipcMain.handle('install-package', async (event, packageName?: string) => {
-  try {
-    await envManager.installPackage(packageName);
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
-  }
-});
-
-ipcMain.handle('env-status', async () => {
-  return envManager.checkEnvironmentReady();
-});
-
-ipcMain.handle('run-phosphobot', async () => {
-  return envManager.runPhosphobot();
-});
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -129,7 +86,7 @@ const createWindow = async () => {
     },
   });
 
-  // Load from localhost:80
+  // Load from localhost:5173
   mainWindow.loadURL('http://localhost:80').catch((err) => {
     console.error('Failed to load localhost:80:', err);
     // Fallback to loading the bundled index.html if the server is not running
@@ -170,19 +127,11 @@ const createWindow = async () => {
  */
 
 app.on('window-all-closed', () => {
-  // Stop phosphobot when closing the app
-  envManager.stopPhosphobot();
-  
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
-});
-
-app.on('before-quit', () => {
-  // Ensure phosphobot is stopped before quitting
-  envManager.stopPhosphobot();
 });
 
 app
