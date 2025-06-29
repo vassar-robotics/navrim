@@ -198,7 +198,7 @@
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
       "gatekeeperAssess": false,
-      "icon": "assets/icon.icns"
+      "icon": "assets/logo.ico"
     },
     "dmg": {
       "contents": [
@@ -213,13 +213,13 @@
           "path": "/Applications"
         }
       ],
-      "icon": "assets/icon.icns"
+      "icon": "assets/logo.ico"
     },
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "assets/icon.ico"
+      "icon": "assets/logo.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -233,7 +233,7 @@
         "deb"
       ],
       "category": "Development",
-      "icon": "assets/icons"
+      "icon": "assets/logo.ico"
     },
     "directories": {
       "app": "release/app",
