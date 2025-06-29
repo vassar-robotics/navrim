@@ -1,6 +1,7 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './App.css';
+import logoImg from '../../assets/logo-with-text.png';
 
 interface EnvironmentStatus {
   uvInstalled: boolean;
@@ -188,6 +189,22 @@ function EnvironmentSetup() {
   return (
     <div className="fallback-container">
       <div className="fallback-content">
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          marginBottom: '20px'
+        }}>
+          <img 
+            src={logoImg}
+            alt="Logo" 
+            style={{
+              height: '60px',
+              width: 'auto',
+              maxWidth: '200px'
+            }}
+          />
+        </div>
         <div className="fallback-icon" style={{ 
           display: 'flex', 
           justifyContent: 'center', 
