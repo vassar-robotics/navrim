@@ -7,8 +7,8 @@ export type Channels =
   | 'check-uv' 
   | 'install-uv' 
   | 'create-env' 
-  | 'install-package'
   | 'env-status'
+  | 'setup-environment'
   | 'run-phosphobot';
 
 const electronHandler = {

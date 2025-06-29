@@ -105,7 +105,7 @@ export class EnvironmentManager {
       }
 
       // Create virtual environment with Python 3.12
-      const { stdout, stderr } = await execAsync(`uv venv -p 3.12 "${this.envPath}"`, {
+      const { stdout, stderr } = await execAsync(`uv venv -p 3.10 "${this.envPath}"`, {
         shell: true,
         env: this.getEnhancedEnv()
       } as any);
@@ -168,7 +168,7 @@ export class EnvironmentManager {
             UV_PROJECT_ENVIRONMENT: this.envPath
           }
         } as any);
-        packageInstalled = stdout.includes('navrim-phosphobot');
+        packageInstalled = stdout.includes('navrim-phosphobot') && stdout.includes('navrim-lerobot');
       } catch (error) {
         console.error('Failed to check package installation:', error);
       }
@@ -260,7 +260,8 @@ export class EnvironmentManager {
     }
     
     if (!status.packageInstalled) {
-      await this.installPackage();
+      await this.installPackage('navrim-phosphobot');
+      await this.installPackage('navrim-lerobot');
     }
   }
 } 

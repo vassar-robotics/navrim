@@ -60,35 +60,26 @@ function EnvironmentSetup() {
 
   const setupEnvironment = async (envStatus: EnvironmentStatus) => {
     try {
-      // Install uv
-      if (!envStatus.uvInstalled) {
-        setProgress(prev => ({ ...prev, installingUv: true }));
-        const result = await window.electron.ipcRenderer.invoke('install-uv');
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to install uv');
-        }
-        setProgress(prev => ({ ...prev, installingUv: false }));
+      // Call backend's setupEnvironment method
+      setProgress(prev => ({ 
+        ...prev, 
+        installingUv: !envStatus.uvInstalled,
+        creatingEnv: !envStatus.envExists,
+        installingPackage: !envStatus.packageInstalled
+      }));
+      
+      const result = await window.electron.ipcRenderer.invoke('setup-environment');
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to setup environment');
       }
-
-      // Create virtual environment
-      if (!envStatus.envExists) {
-        setProgress(prev => ({ ...prev, creatingEnv: true }));
-        const result = await window.electron.ipcRenderer.invoke('create-env');
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to create virtual environment');
-        }
-        setProgress(prev => ({ ...prev, creatingEnv: false }));
-      }
-
-      // Install navrim-phosphobot
-      if (!envStatus.packageInstalled) {
-        setProgress(prev => ({ ...prev, installingPackage: true }));
-        const result = await window.electron.ipcRenderer.invoke('install-package', 'navrim-phosphobot');
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to install navrim-phosphobot');
-        }
-        setProgress(prev => ({ ...prev, installingPackage: false }));
-      }
+      
+      setProgress(prev => ({ 
+        ...prev, 
+        installingUv: false,
+        creatingEnv: false,
+        installingPackage: false
+      }));
 
       // Recheck status
       const newStatus = await window.electron.ipcRenderer.invoke('env-status');
@@ -175,7 +166,7 @@ function EnvironmentSetup() {
     if (progress.checking) return 'Checking environment...';
     if (progress.installingUv) return 'Installing uv...';
     if (progress.creatingEnv) return 'Creating virtual environment...';
-    if (progress.installingPackage) return 'Installing navrim-phosphobot...';
+    if (progress.installingPackage) return 'Installing dependencies...';
     if (progress.startingPhosphobot) return 'Starting phosphobot...';
     if (progress.waitingForService) return 'Waiting for service to be ready...';
     if (progress.error) return `Error: ${progress.error}`;
@@ -183,7 +174,7 @@ function EnvironmentSetup() {
     if (status) {
       if (!status.uvInstalled) return 'uv needs to be installed';
       if (!status.envExists) return 'Virtual environment needs to be created';
-      if (!status.packageInstalled) return 'navrim-phosphobot needs to be installed';
+      if (!status.packageInstalled) return 'navrim-phosphobot and navrim-lerobot needs to be installed';
       return 'Environment is ready';
     }
     
@@ -228,7 +219,7 @@ function EnvironmentSetup() {
           <div style={{ marginTop: '20px', fontSize: '14px', color: '#787774' }}>
             <div>UV: {status.uvInstalled ? '✅ Installed' : '❌ Not installed'}</div>
             <div>Virtual Environment: {status.envExists ? '✅ Created' : '❌ Not created'}</div>
-            <div>navrim-phosphobot: {status.packageInstalled ? '✅ Installed' : '❌ Not installed'}</div>
+            <div>navrim-phosphobot and navrim-lerobot: {status.packageInstalled ? '✅ Installed' : '❌ Not installed'}</div>
           </div>
         )}
 
