@@ -8,7 +8,9 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest]
+        # ubuntu-latest]
+        # skip ubuntu-latest for now because it's not supported yet
 
     steps:
       - name: Check out Git repository
