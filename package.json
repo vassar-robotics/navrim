@@ -199,7 +199,7 @@
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
       "gatekeeperAssess": false,
-      "icon": "assets/logo.ico"
+      "icon": "assets/logo.png"
     },
     "dmg": {
       "contents": [
@@ -214,7 +214,7 @@
           "path": "/Applications"
         }
       ],
-      "icon": "assets/logo.ico"
+      "icon": "assets/logo.png"
     },
     "win": {
       "target": [
@@ -234,7 +234,7 @@
         "deb"
       ],
       "category": "Development",
-      "icon": "assets/logo.ico"
+      "icon": "assets/logo.png"
     },
     "directories": {
       "app": "release/app",
