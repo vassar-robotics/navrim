@@ -29,3 +29,13 @@ npm-debug.log.*
 *.scss.d.ts
 
 .env
+
+# vscode
+.vscode/*
+.vscode
+
+# ToDesktop
+.todesktop
+
+v8-compile-cache-0/
+node-compile-cache/

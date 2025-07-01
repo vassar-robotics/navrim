@@ -1,8 +1,10 @@
 {
     "id": "250629jh7anpj",
     "icon": "./assets/logo.png",
-    "appPath": ".",
+    "appPath": "./release/app",
     "schemaVersion": 1,
-    "nodeVersion": "22.11.0",
-    "appFiles": ["src/**/*.ts", "pnpm-lock.yaml", "src/**/*.ejs", "src/**/*.tsx", "src/**/*.css"]
+    "uploadSizeLimit": 60,
+    "appFiles": [
+        "dist/**/*"
+    ]
 }
