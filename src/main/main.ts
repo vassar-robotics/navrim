@@ -12,17 +12,15 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 const todesktop = require("@todesktop/runtime");
 
-import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { startCopilotKitServer } from './copilotkit';
+import { CopilotKitServer } from './copilotkit';
 import { EnvironmentManager } from './environment';
 
 todesktop.init();
 
 let mainWindow: BrowserWindow | null = null;
-
-// Register environment management IPC handlers
+const copilotKitServer = new CopilotKitServer();
 const envManager = EnvironmentManager.getInstance();
 
 ipcMain.handle('check-uv', async () => {
@@ -64,10 +62,8 @@ ipcMain.handle('run-phosphobot', async () => {
   return envManager.runPhosphobot();
 });
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.handle('restart-copilotkit', async () => {
+  copilotKitServer.restart();
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -164,12 +160,12 @@ const createWindow = async () => {
 app.on('window-all-closed', () => {
   // Stop phosphobot when closing the app
   envManager.stopPhosphobot();
-  
+
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  // if (process.platform !== 'darwin') {
+  app.quit();
+  // }
 });
 
 app.on('before-quit', () => {
@@ -181,7 +177,6 @@ app
   .whenReady()
   .then(() => {
     createWindow();
-    startCopilotKitServer();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

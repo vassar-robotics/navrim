@@ -37,7 +37,7 @@ export class EnvironmentManager {
 
     // Add common paths to PATH
     const enhancedPath = commonPaths.join(path.delimiter) + path.delimiter + (process.env.PATH || '');
-    
+
     return {
       ...process.env,
       PATH: enhancedPath
@@ -72,19 +72,19 @@ export class EnvironmentManager {
     }
 
     console.log(`Installing UV with command: ${installCommand}`);
-    
+
     try {
       const { stdout, stderr } = await execAsync(installCommand, {
         shell: true,
         env: this.getEnhancedEnv()
       } as any);
-      
+
       if (stderr && !stderr.includes('warning')) {
         console.error('UV installation stderr:', stderr);
       }
-      
+
       console.log('UV installation stdout:', stdout);
-      
+
       // Verify installation succeeded
       const isInstalled = await this.checkUvInstalled();
       if (!isInstalled) {
@@ -125,9 +125,9 @@ export class EnvironmentManager {
     try {
       // Use uv pip install to install package in virtual environment
       const command = `uv pip install ${packageName}`;
-      
+
       console.log(`Installing package: ${packageName}`);
-      
+
       const { stdout, stderr } = await execAsync(command, {
         shell: true,
         env: {
@@ -155,7 +155,7 @@ export class EnvironmentManager {
   }> {
     const uvInstalled = await this.checkUvInstalled();
     const envExists = fs.existsSync(this.envPath);
-    
+
     let packageInstalled = false;
     if (envExists) {
       try {
@@ -210,11 +210,11 @@ export class EnvironmentManager {
       });
 
       this.phosphobotProcess.stdout?.on('data', (data) => {
-        console.log(`Phosphobot stdout: ${data}`);
+        console.log(`| Phosphobot STDOUT | ${data.toString().trim()}`);
       });
 
       this.phosphobotProcess.stderr?.on('data', (data) => {
-        console.error(`Phosphobot stderr: ${data}`);
+        console.error(`| Phosphobot STDERR | ${data.toString().trim()}`);
       });
 
       this.phosphobotProcess.on('error', (error) => {
@@ -250,18 +250,18 @@ export class EnvironmentManager {
 
   async setupEnvironment(): Promise<void> {
     const status = await this.checkEnvironmentReady();
-    
+
     if (!status.uvInstalled) {
       await this.installUv();
     }
-    
+
     if (!status.envExists) {
       await this.createVirtualEnvironment();
     }
-    
-    if (!status.packageInstalled) {
-      await this.installPackage('navrim-phosphobot');
-      await this.installPackage('navrim-lerobot');
-    }
+
+    // if (!status.packageInstalled) {
+    await this.installPackage('navrim-phosphobot');
+    await this.installPackage('navrim-lerobot');
+    // }
   }
-} 
+}

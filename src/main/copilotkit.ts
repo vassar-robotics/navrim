@@ -1,34 +1,74 @@
-import { createServer } from 'node:http';
+import http, { createServer } from 'node:http';
 import {
   CopilotRuntime,
   OpenAIAdapter,
   copilotRuntimeNodeHttpEndpoint,
 } from '@copilotkit/runtime';
 import OpenAI from 'openai';
+import path from 'node:path';
+import os from 'node:os';
+import fs from 'node:fs';
 
-export function startCopilotKitServer() {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-  const serviceAdapter = new OpenAIAdapter({ openai: openai });
+export class CopilotKitServer {
+  private openai: OpenAI;
+  private serviceAdapter: OpenAIAdapter;
+  private runtime: CopilotRuntime;
+  private server: http.Server;
 
-  const server = createServer((req, res) => {
-    const runtime = new CopilotRuntime({
+  constructor() {
+    this.runtime = new CopilotRuntime({
       remoteEndpoints: [
         { url: 'http://localhost:80/chat/tools' }
       ],
     });
-
-    const handler = copilotRuntimeNodeHttpEndpoint({
-      endpoint: '/chat/copilotkit',
-      runtime,
-      serviceAdapter,
+    this.openai = new OpenAI({ apiKey: this.readOpenAIApiKey() });
+    this.serviceAdapter = new OpenAIAdapter({ openai: this.openai });
+    this.server = createServer((req, res) => {
+      const handler = copilotRuntimeNodeHttpEndpoint({
+        endpoint: '/chat/copilotkit',
+        runtime: this.runtime,
+        serviceAdapter: this.serviceAdapter,
+      });
+      return handler(req, res);
     });
+    this.server.listen(5175, () => {
+      console.log('Listening at http://localhost:5175/chat/copilotkit');
+    });
+  }
 
-    return handler(req, res);
-  });
+  private readonly openaiTokenPath = path.join(os.homedir(), 'navrim', 'openai.token');
 
-  server.listen(5175, () => {
-    console.log('Listening at http://localhost:5175/chat/copilotkit');
-  });
+  private readOpenAIApiKey(): string {
+    try {
+      if (fs.existsSync(this.openaiTokenPath)) {
+        const apiKey = fs.readFileSync(this.openaiTokenPath, 'utf-8').trim();
+        if (apiKey) {
+          console.log('OpenAI API key found at ~/navrim/openai.token');
+          return apiKey;
+        }
+      }
+      console.log('OpenAI API key not found at ~/navrim/openai.token');
+      return "";
+    } catch (error) {
+      console.error('Failed to read OpenAI API key:', error);
+      return "";
+    }
+  }
+
+  restart() {
+    this.server?.close();
+    this.openai = new OpenAI({ apiKey: this.readOpenAIApiKey() });
+    this.serviceAdapter = new OpenAIAdapter({ openai: this.openai });
+    this.server = createServer((req, res) => {
+      const handler = copilotRuntimeNodeHttpEndpoint({
+        endpoint: '/chat/copilotkit',
+        runtime: this.runtime,
+        serviceAdapter: this.serviceAdapter,
+      });
+      return handler(req, res);
+    });
+    this.server.listen(5175, () => {
+      console.log('Listening at http://localhost:5175/chat/copilotkit');
+    });
+  }
 }
