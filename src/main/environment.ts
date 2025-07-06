@@ -74,7 +74,7 @@ export class EnvironmentManager {
       installCommand = 'curl -LsSf https://astral.sh/uv/install.sh | sh';
     } else if (platform === 'win32') {
       // Windows uses PowerShell
-      installCommand = 'powershell -c "irm https://astral.sh/uv/install.ps1 | iex"';
+      installCommand = 'powershell -ExecutionPolicy ByPass -Command "irm https://astral.sh/uv/install.ps1 | iex"';
     } else {
       throw new Error(`Unsupported platform: ${platform}`);
     }
