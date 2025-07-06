@@ -17,7 +17,7 @@ interface SetupProgress {
   startingPhosphobot: boolean;
   waitingForService: boolean;
   serviceReady?: boolean;
-  error?: string;
+  error: string;
 }
 
 function EnvironmentSetup() {
@@ -29,6 +29,7 @@ function EnvironmentSetup() {
     installingPackage: false,
     startingPhosphobot: false,
     waitingForService: false,
+    error: ''
   });
 
   useEffect(() => {
@@ -64,15 +65,40 @@ function EnvironmentSetup() {
       // Call backend's setupEnvironment method
       setProgress(prev => ({
         ...prev,
-        installingUv: !envStatus.uvInstalled,
-        creatingEnv: !envStatus.envExists,
-        installingPackage: !envStatus.packageInstalled
+        installingUv: true,
       }));
 
-      const result = await window.electron.ipcRenderer.invoke('setup-environment');
-
+      let result = await window.electron.ipcRenderer.invoke('install-uv');
       if (!result.success) {
         throw new Error(result.error || 'Failed to setup environment');
+      }
+
+      setProgress(prev => ({
+        ...prev,
+        installingUv: false,
+        creatingEnv: true,
+        installingPackage: false
+      }));
+
+      result = await window.electron.ipcRenderer.invoke('create-env');
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create virtual environment');
+      }
+
+      setProgress(prev => ({
+        ...prev,
+        installingUv: false,
+        creatingEnv: false,
+        installingPackage: true
+      }));
+
+      result = await window.electron.ipcRenderer.invoke('install-package', 'navrim-phosphobot');
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to install navrim-phosphobot');
+      }
+      result = await window.electron.ipcRenderer.invoke('install-package', 'navrim-lerobot');
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to install navrim-lerobot');
       }
 
       setProgress(prev => ({
@@ -165,18 +191,18 @@ function EnvironmentSetup() {
 
   const getProgressMessage = () => {
     if (progress.checking) return 'Checking environment...';
-    if (progress.installingUv) return 'Installing uv...';
+    if (progress.installingUv) return 'Installing uv... \n(May take a while for the first time)';
     if (progress.creatingEnv) return 'Creating virtual environment...';
-    if (progress.installingPackage) return 'Installing dependencies...';
+    if (progress.installingPackage) return 'Installing dependencies... \n(May take a while for the first time)';
     if (progress.startingPhosphobot) return 'Starting phosphobot...';
-    if (progress.waitingForService) return 'Waiting for service to be ready...';
+    if (progress.waitingForService) return 'Waiting for service to be ready... \n(May take a while for the first time)';
     if (progress.error) return `Error: ${progress.error}`;
 
     if (status) {
       if (!status.uvInstalled) return 'uv needs to be installed';
       if (!status.envExists) return 'Virtual environment needs to be created';
       if (!status.packageInstalled) return 'navrim-phosphobot and navrim-lerobot needs to be installed';
-      return 'Environment is ready';
+      return '';
     }
 
     return 'Preparing...';
@@ -184,7 +210,7 @@ function EnvironmentSetup() {
 
   const isLoading = progress.checking || progress.installingUv ||
                    progress.creatingEnv || progress.installingPackage ||
-                   progress.startingPhosphobot || progress.waitingForService;
+                   progress.startingPhosphobot || progress.waitingForService
 
   return (
     <div className="fallback-container">
@@ -212,7 +238,7 @@ function EnvironmentSetup() {
           height: '72px',
           marginBottom: '20px'
         }}>
-          {isLoading ? (
+          {isLoading || progress.error=='' ? (
             <div style={{
               width: '48px',
               height: '48px',
@@ -222,33 +248,38 @@ function EnvironmentSetup() {
               animation: 'spin 1s linear infinite',
               margin: '0 auto'
             }} />
-          ) : (progress.error ? '❌' : '⚠️')}
+          ) : '❌'}
         </div>
         <h1 className="fallback-title">
-          {isLoading ? 'Setting up environment' : (progress.error ? 'Something went wrong' : 'Environment not ready')}
+          {isLoading || progress.error=='' ? 'Setting up environment' : 'Something went wrong'}
         </h1>
-        <p className="fallback-message">
-          {getProgressMessage()}
-        </p>
+        <div className="fallback-message" style={{ 
+          fontSize: '14px', 
+          maxWidth: '800px', 
+          maxHeight: '300px',
+          overflowY: 'auto',
+          textAlign: 'center',
+        }}>
+          {getProgressMessage().split('\n').map((line, index) => (
+            <div key={index} style={{ marginBottom: '8px' }}>
+              {line}
+            </div>
+          ))}
+        </div>
 
-        {/* Show detailed status */}
-        {status && !isLoading && !progress.error && (
-          <div style={{ marginTop: '20px', fontSize: '14px', color: '#787774' }}>
-            <div>UV: {status.uvInstalled ? '✅ Installed' : '❌ Not installed'}</div>
-            <div>Virtual Environment: {status.envExists ? '✅ Created' : '❌ Not created'}</div>
-            <div>navrim-phosphobot and navrim-lerobot: {status.packageInstalled ? '✅ Installed' : '❌ Not installed'}</div>
-          </div>
-        )}
+        <div></div>
 
-        {/* Show retry button on error */}
-        {progress.error && (
-          <button
-            onClick={checkAndSetupEnvironment}
-            style={{ marginTop: '20px' }}
-          >
-            Retry
-          </button>
-        )}
+      {progress.error && (
+        <div style={{
+          marginTop: '20px',
+          textAlign: 'center',
+          fontSize: '16px',
+          color: '#666'
+        }}>
+          Need help?<br></br>Please contact us at<a href="mailto:support@navrim.com" style={{ color: '#0066CC', textDecoration: 'none' }}>support@navrim.com</a>
+        </div>
+      )}
+
       </div>
 
       <style>{`

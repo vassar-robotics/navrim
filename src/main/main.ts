@@ -45,9 +45,9 @@ ipcMain.handle('create-env', async () => {
   }
 });
 
-ipcMain.handle('setup-environment', async () => {
+ipcMain.handle('install-package', async (event, packageName: string) => {
   try {
-    await envManager.setupEnvironment();
+    await envManager.installPackage(packageName);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

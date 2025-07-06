@@ -7,7 +7,7 @@ export type Channels =
   | 'install-uv'
   | 'create-env'
   | 'env-status'
-  | 'setup-environment'
+  | 'install-package'
   | 'run-phosphobot'
   | 'restart-copilotkit';
 

@@ -58,6 +58,14 @@ export class EnvironmentManager {
   }
 
   async installUv(): Promise<void> {
+
+    // Check if uv is already installed
+    const isInstalled = await this.checkUvInstalled();
+    if (isInstalled) {
+      console.log('UV is already installed');
+      return;
+    }
+
     const platform = os.platform();
     let installCommand: string;
 
@@ -124,7 +132,7 @@ export class EnvironmentManager {
   async installPackage(packageName: string = 'navrim-phosphobot'): Promise<void> {
     try {
       // Use uv pip install to install package in virtual environment
-      const command = `uv pip install ${packageName}`;
+      const command = `uv pip install -U ${packageName}`;
 
       console.log(`Installing package: ${packageName}`);
 
@@ -246,22 +254,5 @@ export class EnvironmentManager {
       this.phosphobotProcess.kill();
       this.phosphobotProcess = null;
     }
-  }
-
-  async setupEnvironment(): Promise<void> {
-    const status = await this.checkEnvironmentReady();
-
-    if (!status.uvInstalled) {
-      await this.installUv();
-    }
-
-    if (!status.envExists) {
-      await this.createVirtualEnvironment();
-    }
-
-    // if (!status.packageInstalled) {
-    await this.installPackage('navrim-phosphobot');
-    await this.installPackage('navrim-lerobot');
-    // }
   }
 }
