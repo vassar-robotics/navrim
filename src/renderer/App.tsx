@@ -140,7 +140,7 @@ function EnvironmentSetup() {
   };
 
   const waitForService = async () => {
-    const maxAttempts = 60; // 60 seconds max wait
+    const maxAttempts = 180; // 180 seconds max wait
     let attempts = 0;
 
     while (attempts < maxAttempts) {
@@ -172,7 +172,7 @@ function EnvironmentSetup() {
       const serviceReady = await waitForService();
 
       if (!serviceReady) {
-        throw new Error('Service failed to start within 60 seconds');
+        throw new Error('Service failed to start within 180 seconds');
       }
 
       setProgress(prev => ({ ...prev, waitingForService: false }));
