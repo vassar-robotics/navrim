@@ -149,11 +149,26 @@ export class EnvironmentManager {
         console.error('Package installation stderr:', stderr);
       }
 
+      await this.checkPackageVersion(packageName);
+
       console.log('Package installation stdout:', stdout);
     } catch (error: any) {
       console.error('Failed to install package:', error);
       throw new Error(`Failed to install package: ${error.message}`);
     }
+  }
+
+  async checkPackageVersion(packageName: string): Promise<void> {
+    const { stdout } = await execAsync(`uv pip show ${packageName}`, {
+      shell: true,
+      env: {
+        ...this.getEnhancedEnv(),
+        VIRTUAL_ENV: this.envPath,
+        UV_PROJECT_ENVIRONMENT: this.envPath
+      }
+    } as any);
+
+    console.log(`${packageName} version:`, stdout.toString());
   }
 
   async checkEnvironmentReady(): Promise<{
