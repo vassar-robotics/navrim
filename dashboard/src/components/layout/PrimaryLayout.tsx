@@ -13,7 +13,7 @@ const PrimaryLayout: React.FC = () => {
         <Sidebar />
 
         {/* Main Content Area */}
-        <main className="flex-1 p-8 overflow-y-auto bg-gray-50">
+        <main className="flex-1 p-4 sm:p-5 lg:p-6 overflow-y-auto bg-gray-50">
           <Outlet />
         </main>
       </div>

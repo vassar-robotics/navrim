@@ -4,6 +4,10 @@ import DashboardPage from '@/pages/DashboardPage';
 import ControlPage from '@/pages/ControlPage';
 import DatasetsPage from '@/pages/DatasetsPage';
 import TrainingPage from '@/pages/TrainingPage';
+import InferencePage from '@/pages/InferencePage';
+import ConfigurationPage from '@/pages/ConfigurationPage';
+import CamerasPage from '@/pages/CamerasPage';
+import ChatPage from '@/pages/ChatPage';
 
 export default function App() {
   return (
@@ -14,6 +18,10 @@ export default function App() {
           <Route path="control" element={<ControlPage />} />
           <Route path="datasets" element={<DatasetsPage />} />
           <Route path="training" element={<TrainingPage />} />
+          <Route path="inference" element={<InferencePage />} />
+          <Route path="configuration" element={<ConfigurationPage />} />
+          <Route path="cameras" element={<CamerasPage />} />
+          <Route path="chat" element={<ChatPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
