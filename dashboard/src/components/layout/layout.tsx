@@ -10,7 +10,7 @@ const RootLayout: React.FC = () => {
       className="hidden md:flex"
       style={
         {
-          '--sidebar-width': 'calc(var(--spacing) * 64)',
+          '--sidebar-width': 'calc(var(--spacing) * 48)',
           '--header-height': 'calc(var(--spacing) * 12 + 1px)',
         } as React.CSSProperties
       }

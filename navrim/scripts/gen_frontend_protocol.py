@@ -62,6 +62,7 @@ def pydantic_to_typescript(source_path: Path, target_path: Path, indent: int = 2
         "// DO NOT MODIFY THIS FILE DIRECTLY OR YOUR CHANGES WILL BE OVERWRITTEN BY THE NEXT GENERATION.\n"
     )
     typescript_code = "\n".join([header] + ts_interfaces)
+    target_path.parent.mkdir(parents=True, exist_ok=True)
     target_path.write_text(typescript_code)
     type_mapping.setdefault(interface_name, interface_name)
 

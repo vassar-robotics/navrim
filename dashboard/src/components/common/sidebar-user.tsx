@@ -1,4 +1,5 @@
 import type React from 'react'
+import { useAuth } from '@/components/context/auth'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import {
   DropdownMenu,
@@ -9,11 +10,15 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Bell, CreditCard, Ellipsis, LogOut, UserCircle } from 'lucide-react'
+
+const displayNameFallback = 'John Doe'
+const emailFallback = 'john.doe@example.com'
 
 const SidebarUser: React.FC = () => {
   const { isMobile } = useSidebar()
+  const { auth } = useAuth()
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -23,13 +28,11 @@ const SidebarUser: React.FC = () => {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">name</span>
-                <span className="truncate text-xs text-muted-foreground">email</span>
+                <span className="truncate font-medium">{auth?.userProfile?.display_name || displayNameFallback}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {auth?.session?.user_email || emailFallback}
+                </span>
               </div>
               <Ellipsis className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -42,13 +45,11 @@ const SidebarUser: React.FC = () => {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">name</span>
-                  <span className="truncate text-xs text-muted-foreground">email</span>
+                  <span className="truncate font-medium">{auth?.userProfile?.display_name || displayNameFallback}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {auth?.session?.user_email || emailFallback}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>

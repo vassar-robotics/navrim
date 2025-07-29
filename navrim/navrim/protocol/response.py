@@ -61,3 +61,7 @@ class Session(BaseModel):
 
 class SessionResponse(BaseModel):
     session: Session
+
+
+class UserProfile(BaseModel):
+    display_name: str
