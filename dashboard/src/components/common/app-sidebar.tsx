@@ -10,9 +10,10 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import type React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Cog, CircleGauge, Gamepad2, Database, Brain, Cpu, MessageSquare, Settings, Camera } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import SidebarUser from '@/components/common/sidebar-user'
 
 type SidebarMenuItem = {
   name: string
@@ -91,6 +92,8 @@ const sidebarMenuItems: SidebarMenuItem[] = [
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const location = useLocation()
+
   return (
     <Sidebar className="h-auto border-r" {...props}>
       <SidebarHeader className="border-b">
@@ -110,21 +113,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroup key={group.name}>
             <SidebarGroupLabel>{group.name.toUpperCase()}</SidebarGroupLabel>
             <SidebarMenu>
-              {group.items.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {group.items.map((item) => {
+                const isActive = location.pathname === item.href
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link to={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter>
+        <SidebarUser />
+      </SidebarFooter>
     </Sidebar>
   )
 }
