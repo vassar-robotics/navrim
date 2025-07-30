@@ -90,7 +90,7 @@ const sidebarMenuItems: SidebarMenuItem[] = [
   },
 ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
   const location = useLocation()
 
   return (

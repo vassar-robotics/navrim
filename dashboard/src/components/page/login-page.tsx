@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Cog } from 'lucide-react'
 import PageLayout from '@/components/layout/page-layout'
 
-export function LoginPage() {
+export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
