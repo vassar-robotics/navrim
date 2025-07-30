@@ -2,9 +2,9 @@
 // DO NOT MODIFY THIS FILE DIRECTLY OR YOUR CHANGES WILL BE OVERWRITTEN BY THE NEXT GENERATION.
 
 export interface TokenRequest {
-  token: string;
-};
+  token: string
+}
 
 export interface EmailRequest {
-  email: string;
-};
+  email: string
+}

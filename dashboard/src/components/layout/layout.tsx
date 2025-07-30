@@ -1,6 +1,6 @@
 import React from 'react'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/common/app-sidebar'
+import { AppSidebar } from '@/components/common/sidebar/app-sidebar'
 import PageHeader from '@/components/common/page-header'
 import { Outlet } from 'react-router-dom'
 
@@ -18,7 +18,7 @@ const RootLayout: React.FC = () => {
       <AppSidebar variant="sidebar" />
       <SidebarInset className="flex h-screen flex-col overflow-hidden">
         <PageHeader />
-        <div className="flex-1 overflow-auto pt-[var(--header-height)]">
+        <div className="flex flex-col flex-1 overflow-auto pt-[var(--header-height)]">
           <Outlet />
         </div>
       </SidebarInset>

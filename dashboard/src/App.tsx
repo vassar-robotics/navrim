@@ -1,6 +1,8 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import RootLayout from './components/layout/layout'
+import { LoginPage } from './components/page/login-page'
+import { SignupPage } from './components/page/signup-page'
 
 const App: React.FC = () => {
   return (
@@ -16,6 +18,8 @@ const App: React.FC = () => {
           <Route path="/chat" element={<div>Chat</div>} />
           <Route path="/configuration" element={<div>Configuration</div>} />
           <Route path="/cameras" element={<div>Cameras</div>} />
+          <Route path="/signin" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

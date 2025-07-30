@@ -2,40 +2,40 @@
 // DO NOT MODIFY THIS FILE DIRECTLY OR YOUR CHANGES WILL BE OVERWRITTEN BY THE NEXT GENERATION.
 
 export interface GetTokenResponse {
-  token: string;
-};
+  token: string
+}
 
 export interface GetThirdPartyTokensResponse {
-  huggingface: string;
-  openai: string;
-  wandb: string;
-};
+  huggingface: string
+  openai: string
+  wandb: string
+}
 
 export interface VerifyTokenResponse {
-  valid: boolean;
-  reason: string;
-};
+  valid: boolean
+  reason: string
+}
 
 export interface GetServerStatusResponse {
-  status: string;
-  ip_address: string;
-  port: number;
-  hostname: string;
-};
+  status: string
+  ip_address: string
+  port: number
+  hostname: string
+}
 
 export interface Session {
-  user_id: string;
-  user_email: string;
-  email_confirmed: boolean;
-  access_token: string;
-  refresh_token: string;
-  expires_at: number;
-};
+  user_id: string
+  user_email: string
+  email_confirmed: boolean
+  access_token: string
+  refresh_token: string
+  expires_at: number
+}
 
 export interface SessionResponse {
-  session: Session;
-};
+  session: Session
+}
 
 export interface UserProfile {
-  display_name: string;
-};
+  display_name: string
+}

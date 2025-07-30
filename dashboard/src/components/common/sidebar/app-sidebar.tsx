@@ -1,7 +1,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -13,7 +12,7 @@ import type React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Cog, CircleGauge, Gamepad2, Database, Brain, Cpu, MessageSquare, Settings, Camera } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import SidebarUser from '@/components/common/sidebar-user'
+import AppSidebarFooter from '@/components/common/sidebar/sidebar-footer'
 
 type SidebarMenuItem = {
   name: string
@@ -130,9 +129,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarUser />
-      </SidebarFooter>
+      <AppSidebarFooter />
     </Sidebar>
   )
 }
