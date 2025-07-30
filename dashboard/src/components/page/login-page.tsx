@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Cog } from 'lucide-react'
+import PageLayout from '@/components/layout/page-layout'
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
@@ -22,7 +23,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-background px-4 py-8">
+    <PageLayout>
       <div className="w-full max-w-sm space-y-6">
         {/* Logo and Title */}
         <div className="flex flex-col items-center space-y-2">
@@ -84,6 +85,6 @@ export function LoginPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </PageLayout>
   )
 }

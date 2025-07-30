@@ -18,7 +18,7 @@ const RootLayout: React.FC = () => {
       <AppSidebar variant="sidebar" />
       <SidebarInset className="flex h-screen flex-col overflow-hidden">
         <PageHeader />
-        <div className="flex flex-col flex-1 overflow-auto pt-[var(--header-height)]">
+        <div className="flex flex-1 flex-col overflow-auto pt-[var(--header-height)]">
           <Outlet />
         </div>
       </SidebarInset>
