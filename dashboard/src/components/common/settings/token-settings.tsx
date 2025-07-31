@@ -9,7 +9,8 @@ export const TokenSettings: React.FC<{
   toolTip: string
   placeholder: string
   hint: React.ReactNode
-}> = ({ title, toolTip, placeholder, hint }) => {
+  tokenType: string
+}> = ({ title, toolTip, placeholder, hint, tokenType }) => {
   const [token, setToken] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isTokenSaved, setIsTokenSaved] = useState(false)
@@ -30,9 +31,9 @@ export const TokenSettings: React.FC<{
   return (
     <div className="space-y-4 px-6 py-2">
       <div className="space-y-2">
-        <form onSubmit={handleSubmit} className="space-y-2">
+        <form id={`${tokenType}-token-form`} onSubmit={handleSubmit} className="space-y-2">
           <div className="space-y-2">
-            <label htmlFor="token" className="flex items-center gap-2 text-sm leading-none font-medium">
+            <label htmlFor={`${tokenType}-token`} className="flex items-center gap-2 text-sm leading-none font-medium">
               {title}
               <TooltipProvider>
                 <Tooltip>
@@ -48,7 +49,7 @@ export const TokenSettings: React.FC<{
             <div className="text-sm text-gray-500">{hint}</div>
             <div className="flex gap-x-2">
               <Input
-                id="token"
+                id={`${tokenType}-token`}
                 type="password"
                 placeholder={placeholder}
                 value={token}

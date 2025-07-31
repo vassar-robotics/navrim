@@ -8,7 +8,7 @@ export const ConfigPage: React.FC = () => {
   return (
     <PageLayout>
       <div className="flex h-full w-full flex-col items-start justify-start">
-        <div className="w-full space-y-8">
+        <div className="w-full space-y-4">
           {/* API Key Settings */}
           <ConfigCard title="API Key Settings" icon={<Key className="h-5 w-5" />}>
             <TokenSettings
@@ -31,6 +31,7 @@ export const ConfigPage: React.FC = () => {
                 </p>
               }
               key="huggingface-token"
+              tokenType="huggingface"
             />
             <TokenSettings
               title="Weights and Biases token"
@@ -51,6 +52,7 @@ export const ConfigPage: React.FC = () => {
                 </p>
               }
               key="wandb-token"
+              tokenType="wandb"
             />
             <TokenSettings
               title="OpenAI API Key"
@@ -73,6 +75,7 @@ export const ConfigPage: React.FC = () => {
                 </p>
               }
               key="openai-token"
+              tokenType="openai"
             />
           </ConfigCard>
           <ConfigCard title="Recording Settings" icon={<Play className="h-5 w-5" />}>
