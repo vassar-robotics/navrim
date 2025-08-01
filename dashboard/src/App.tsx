@@ -7,6 +7,7 @@ import { NotFoundPage } from '@/components/page/not-found-page'
 import { ConfigPage } from '@/components/page/config-page'
 import { CameraPage } from '@/components/page/camera-page'
 import { ProtectedRoute } from './components/context/auth/protected-route'
+import { DatasetPage } from '@/components/page/dataset-page'
 
 const App: React.FC = () => {
   return (
@@ -16,7 +17,7 @@ const App: React.FC = () => {
           <Route index element={<div>Hello, navrim!</div>} />
           <Route path="/dashboard" element={<div>Dashboard</div>} />
           <Route path="/control" element={<div>Control</div>} />
-          <Route path="/datasets" element={<div>Datasets</div>} />
+          <Route path="/datasets" element={<DatasetPage />} />
           <Route
             path="/training"
             element={

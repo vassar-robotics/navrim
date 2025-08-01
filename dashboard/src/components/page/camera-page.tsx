@@ -1,7 +1,5 @@
 import PageLayout from '@/components/layout/page-layout'
-import { Camera, Settings } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Toggle } from '@/components/ui/toggle'
+import { Camera } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 
@@ -44,17 +42,12 @@ const CameraCard: React.FC<CameraCardProps> = ({ name, status, imageUrl }) => {
         </div>
 
         {/* Control Row */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
-            <Toggle variant="outline" size="sm" aria-label="Toggle preview quality" className="h-8 px-2 text-xs">
-              HQ Preview
-            </Toggle>
-          </div>
-          <div className="flex items-center gap-2">
-            <Checkbox id={`stream-${name}`} />
-            <Label htmlFor={`stream-${name}`} className="cursor-pointer text-xs">
-              Camera Stream
+            <Label htmlFor={`stream-${name}`} className="cursor-pointer">
+              Enable Stream
             </Label>
+            <Checkbox id={`stream-${name}`} />
           </div>
         </div>
       </div>
@@ -99,9 +92,9 @@ export const CameraPage: React.FC = () => {
 
   return (
     <PageLayout className="items-start">
-      <div className="mx-auto w-full max-w-7xl">
+      <div className="container mx-auto w-full">
         {/* Camera Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {cameras.map((camera) => (
             <CameraCard key={camera.id} {...camera} />
           ))}
