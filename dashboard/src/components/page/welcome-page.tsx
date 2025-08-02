@@ -96,7 +96,7 @@ const WelcomePage: React.FC = () => {
 
   return (
     <PageLayout>
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="mb-12 space-y-4 text-center">
           <div className="mb-6 flex items-center justify-center space-x-3">

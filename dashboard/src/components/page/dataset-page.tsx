@@ -17,7 +17,7 @@ const DatasetPageHeader: React.FC = () => {
   const path = searchParams.get('path') || ''
   const pathParts = path.split('/').filter(Boolean)
   return (
-    <div className="container mx-auto mb-4 flex items-center justify-between">
+    <div className="mb-4 flex w-full items-center justify-between">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -70,9 +70,11 @@ const DatasetTable: React.FC = () => {
 
 export const DatasetPage: React.FC = () => {
   return (
-    <PageLayout>
-      <DatasetPageHeader />
-      <DatasetTable />
+    <PageLayout className="items-start">
+      <div className="container flex flex-1 flex-col items-start">
+        <DatasetPageHeader />
+        <DatasetTable />
+      </div>
     </PageLayout>
   )
 }
