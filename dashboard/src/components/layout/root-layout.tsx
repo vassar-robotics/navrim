@@ -1,6 +1,6 @@
 import React from 'react'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/common/sidebar/app-sidebar'
+import { AppSidebar } from '@/components/common/app-sidebar'
 import PageHeader from '@/components/common/page-header'
 import { Outlet } from 'react-router-dom'
 

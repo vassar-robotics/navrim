@@ -60,10 +60,19 @@ const DatasetPageHeader: React.FC = () => {
   )
 }
 
+const DatasetTable: React.FC = () => {
+  return (
+    <div>
+      <h1>Dataset Table</h1>
+    </div>
+  )
+}
+
 export const DatasetPage: React.FC = () => {
   return (
-    <PageLayout className="items-start">
+    <PageLayout>
       <DatasetPageHeader />
+      <DatasetTable />
     </PageLayout>
   )
 }
