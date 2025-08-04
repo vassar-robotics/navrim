@@ -12,16 +12,16 @@ const PrivacyPolicyPage: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="prose prose-gray max-w-none dark:prose-invert">
+        <div className="prose prose-gray dark:prose-invert max-w-none">
           <div className="space-y-8">
             {/* Introduction */}
             <section className="space-y-4">
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
                 dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
                 ex ea commodo consequat.
               </p>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
                 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
                 laborum.
@@ -31,7 +31,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 1: Information We Collect */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">1. Information We Collect</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
                 dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris:
               </p>
@@ -65,7 +65,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 2: How We Use Your Information */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">2. How We Use Your Information</h2>
-              <p className="text-muted-foreground leading-relaxed">Lorem ipsum dolor sit amet consectetur:</p>
+              <p className="leading-relaxed text-muted-foreground">Lorem ipsum dolor sit amet consectetur:</p>
               <ul className="ml-6 list-disc space-y-2 text-muted-foreground">
                 <li>Anim id est laborum sed do eiusmod</li>
                 <li>Tempor incididunt ut labore et dolore</li>
@@ -81,7 +81,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 3: Data Processing for AI */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">3. Data Processing for AI Training</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor:
               </p>
               <ul className="ml-6 list-disc space-y-2 text-muted-foreground">
@@ -97,7 +97,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 4: Data Sharing */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">4. Information Sharing and Disclosure</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud
                 exercitation ullamco laboris nisi ut aliquip:
               </p>
@@ -113,7 +113,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 5: Data Security */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">5. Data Security</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt:
               </p>
               <ul className="ml-6 list-disc space-y-2 text-muted-foreground">
@@ -124,7 +124,7 @@ const PrivacyPolicyPage: React.FC = () => {
                 <li>Incidunt ut labore et dolore magnam</li>
                 <li>Aliquam quaerat voluptatem ut enim</li>
               </ul>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in
                 voluptate velit esse cillum dolore eu fugiat nulla pariatur.
               </p>
@@ -133,7 +133,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 6: Data Retention */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">6. Data Retention</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam libero tempore, cum soluta nobis est
                 eligendi optio cumque nihil impedit quo minus:
               </p>
@@ -148,7 +148,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 7: Your Rights */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">7. Your Rights and Choices</h2>
-              <p className="text-muted-foreground leading-relaxed">Lorem ipsum dolor sit amet:</p>
+              <p className="leading-relaxed text-muted-foreground">Lorem ipsum dolor sit amet:</p>
               <ul className="ml-6 list-disc space-y-2 text-muted-foreground">
                 <li>Saepe eveniet ut et voluptates repudiandae</li>
                 <li>Sint et molestiae non recusandae</li>
@@ -158,7 +158,7 @@ const PrivacyPolicyPage: React.FC = () => {
                 <li>Cum soluta nobis est eligendi optio</li>
                 <li>Cumque nihil impedit quo minus id</li>
               </ul>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.
               </p>
             </section>
@@ -166,7 +166,7 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 8: Cookies */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">8. Cookies and Tracking Technologies</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit:
               </p>
               <ul className="ml-6 list-disc space-y-2 text-muted-foreground">
@@ -175,7 +175,7 @@ const PrivacyPolicyPage: React.FC = () => {
                 <li>Autem quibusdam et aut officiis</li>
                 <li>Debitis aut rerum necessitatibus saepe</li>
               </ul>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minima veniam, quis nostrum
                 exercitationem ullam corporis suscipit laboriosam.
               </p>
@@ -184,47 +184,47 @@ const PrivacyPolicyPage: React.FC = () => {
             {/* Section 9: International Data Transfers */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">9. International Data Transfers</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.
-                Et dolore magna aliqua ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                aliquip ex ea commodo consequat duis aute irure dolor.
+              <p className="leading-relaxed text-muted-foreground">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore. Et
+                dolore magna aliqua ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+                ex ea commodo consequat duis aute irure dolor.
               </p>
             </section>
 
             {/* Section 10: Children's Privacy */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">10. Children's Privacy</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nisi ut aliquid ex ea commodi consequatur?
-                Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur,
-                vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.
+              <p className="leading-relaxed text-muted-foreground">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nisi ut aliquid ex ea commodi consequatur? Quis
+                autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel
+                illum qui dolorem eum fugiat quo voluptas nulla pariatur.
               </p>
             </section>
 
             {/* Section 11: Third-Party Links */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">11. Third-Party Links and Services</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. At vero eos et accusamus et iusto odio
-                dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et
-                quas molestias excepturi sint occaecati cupiditate.
+                dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas
+                molestias excepturi sint occaecati cupiditate.
               </p>
             </section>
 
             {/* Section 12: Changes to Privacy Policy */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">12. Changes to This Privacy Policy</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Non provident, similique sunt in culpa qui
-                officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est
-                et expedita distinctio nam libero tempore.
+                officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et
+                expedita distinctio nam libero tempore.
               </p>
             </section>
 
             {/* Section 13: Contact Us */}
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">13. Contact Us</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor:
               </p>
               <div className="ml-6 space-y-1 text-muted-foreground">

@@ -11,6 +11,7 @@ import { DatasetPage } from '@/components/page/dataset-page'
 import WelcomePage from '@/components/page/welcome-page'
 import TermsPage from '@/components/page/terms-page'
 import PrivacyPolicyPage from '@/components/page/privacy-policy-page'
+import ChatPage from './components/page/chat-page'
 
 const App: React.FC = () => {
   return (
@@ -41,7 +42,7 @@ const App: React.FC = () => {
             path="/chat"
             element={
               <ProtectedRoute>
-                <div>Chat</div>
+                <ChatPage />
               </ProtectedRoute>
             }
           />
