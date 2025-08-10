@@ -1,51 +1,50 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Cog } from 'lucide-react'
 import PageLayout from '@/components/layout/page-layout'
+import { useAuth } from '@/components/context/auth'
+
+// Define the form schema with zod
+const signupFormSchema = z
+  .object({
+    displayName: z.string().min(1, 'Display name is required').max(32, 'Display name must be 32 characters or less'),
+    email: z.string().min(1, 'Email is required').pipe(z.email('Please enter a valid email address')),
+    password: z
+      .string()
+      .min(6, 'Password must be at least 6 characters')
+      .max(32, 'Password must be 32 characters or less'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
+
+// Infer the form values type from the schema
+type SignupFormValues = z.infer<typeof signupFormSchema>
 
 export const SignupPage: React.FC = () => {
-  const [displayName, setDisplayName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{
-    password?: string
-    confirmPassword?: string
-  }>({})
+  const { signup } = useAuth()
 
-  const validateForm = () => {
-    const newErrors: typeof errors = {}
+  // Initialize the form with react-hook-form and zod resolver
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupFormSchema),
+    defaultValues: {
+      displayName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  })
 
-    if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
-    }
-
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    setIsLoading(true)
-
-    // Simulate loading for demo purposes
-    setTimeout(() => {
-      setIsLoading(false)
-      console.log('Signup attempt:', { displayName, email, password })
-      // Backend connection will be added later
-    }, 1000)
+  // Handle form submission
+  const onSubmit = async (values: SignupFormValues) => {
+    await signup(values.email, values.password, values.displayName)
   }
 
   return (
@@ -61,96 +60,107 @@ export const SignupPage: React.FC = () => {
         </div>
 
         {/* Signup Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="displayName" className="text-sm font-medium">
-              Display Name
-            </label>
-            <Input
-              id="displayName"
-              type="text"
-              placeholder="John Doe"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              required
-              disabled={isLoading}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="displayName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Display Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" {...field} disabled={form.formState.isSubmitting} />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    {field.value && !form.formState.errors.displayName && <>{field.value.length}/32 characters</>}
+                  </FormDescription>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={isLoading}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="name@example.com"
+                      {...field}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value)
-                if (errors.password) {
-                  setErrors({ ...errors, password: undefined })
-                }
-              }}
-              required
-              disabled={isLoading}
-              aria-invalid={!!errors.password}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Create a password (6-32 characters)"
+                      {...field}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    {field.value && !form.formState.errors.password && (
+                      <>
+                        {field.value.length < 6
+                          ? `${6 - field.value.length} more characters needed`
+                          : `${field.value.length}/32 characters`}
+                      </>
+                    )}
+                  </FormDescription>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
             />
-            {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Confirm Password
-            </label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value)
-                if (errors.confirmPassword) {
-                  setErrors({ ...errors, confirmPassword: undefined })
-                }
-              }}
-              required
-              disabled={isLoading}
-              aria-invalid={!!errors.confirmPassword}
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Confirm your password"
+                      {...field}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
             />
-            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
-          </div>
 
-          <div className="text-xs text-muted-foreground">
-            By signing up, you agree to our{' '}
-            <Link to="/terms" className="text-primary hover:underline">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link to="/privacy" className="text-primary hover:underline">
-              Privacy Policy
-            </Link>
-          </div>
+            <div className="text-xs text-muted-foreground">
+              By signing up, you agree to our{' '}
+              <Link to="/terms" className="text-primary hover:underline">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" className="text-primary hover:underline">
+                Privacy Policy
+              </Link>
+            </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Sign Up'}
-          </Button>
-        </form>
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Creating account...' : 'Sign Up'}
+            </Button>
+          </form>
+        </Form>
 
         {/* Sign in link */}
         <div className="text-center text-sm">

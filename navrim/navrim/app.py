@@ -1,6 +1,7 @@
 import traceback
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -8,6 +9,15 @@ from navrim.endpoint import router_auth, router_configuration, router_status
 from navrim.protocol import NavrimServiceResponse, codes
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(router_configuration)
 app.include_router(router_status)
 app.include_router(router_auth)

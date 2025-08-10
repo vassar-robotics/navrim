@@ -7,8 +7,8 @@ from gotrue.errors import AuthApiError
 from navrim.config import config
 from navrim.protocol import NavrimServiceResponse, NoData
 from navrim.protocol.request import ResetPasswordRequest, SignInCredentialsRequest, SignUpCredentialsRequest
-from navrim.protocol.response import Session, SessionResponse
-from navrim.service.supabase_api import get_client
+from navrim.protocol.response import Session, SessionResponse, UserProfile
+from navrim.service.supabase_api import get_client, get_user_session
 from navrim.util import get_local_ip_address
 
 router = APIRouter(tags=["auth"])
@@ -70,6 +70,28 @@ async def signin(request: SignInCredentialsRequest) -> NavrimServiceResponse[Ses
         refresh_token=session.refresh_token,
     )
     return NavrimServiceResponse.success(SessionResponse(session=session))
+
+
+@router.post("/auth/session")
+async def session() -> NavrimServiceResponse[SessionResponse]:
+    session = await get_user_session()
+    return NavrimServiceResponse.success(
+        SessionResponse(
+            session=Session(
+                user_id=session.user.id,
+                user_email=session.user.email,
+                email_confirmed=session.user.email_confirmed_at is not None,
+                access_token=session.access_token,
+                refresh_token=session.refresh_token,
+                expires_at=int(time.time()) + session.expires_in,
+            )
+        )
+    )
+
+
+@router.post("/auth/profile")
+async def profile() -> NavrimServiceResponse[UserProfile]:
+    return NavrimServiceResponse.success(UserProfile(display_name="haha"))
 
 
 @router.post("/auth/forgot-password")
