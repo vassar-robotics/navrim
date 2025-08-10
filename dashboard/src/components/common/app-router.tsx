@@ -12,6 +12,7 @@ import WelcomePage from '@/components/page/welcome-page'
 import TermsPage from '@/components/page/terms-page'
 import PrivacyPolicyPage from '@/components/page/privacy-policy-page'
 import ChatPage from '@/components/page/chat-page'
+import ForgetPasswordPage from '@/components/page/forget-password-page'
 
 const AppRouter: React.FC = () => {
   return (
@@ -50,6 +51,7 @@ const AppRouter: React.FC = () => {
           <Route path="/cameras" element={<CameraPage />} />
           <Route path="/signin" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgetPasswordPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="*" element={<NotFoundPage />} />
