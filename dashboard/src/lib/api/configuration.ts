@@ -5,30 +5,39 @@ import type { GetThirdPartyTokensResponse, GetTokenResponse, VerifyTokenResponse
 export type TokenType = 'huggingface' | 'openai' | 'wandb'
 
 export const ConfigurationApi = {
-  // Get all third-party tokens at once
+  endpoints: {
+    getThirdPartyTokens: '/config/token/third-party/get',
+    getToken: '/config/token/:tokenType/get',
+    updateToken: '/config/token/:tokenType/update',
+    deleteToken: '/config/token/:tokenType/delete',
+    verifyToken: '/config/token/:tokenType/verify',
+  },
+
   getThirdPartyTokens: async (): Promise<GetThirdPartyTokensResponse> => {
-    return fetcher('/config/token/third-party/get', { method: 'POST' })
+    return fetcher(ConfigurationApi.endpoints.getThirdPartyTokens, { method: 'POST' })
   },
 
-  // Get individual token
   getToken: async (tokenType: TokenType): Promise<GetTokenResponse> => {
-    return fetcher(`/config/token/${tokenType}/get`, { method: 'POST' })
+    return fetcher(ConfigurationApi.endpoints.getToken.replace('/:tokenType/', `/${tokenType}/`), { method: 'POST' })
   },
 
-  // Update token
   updateToken: async (tokenType: TokenType, token: string): Promise<void> => {
     const request: TokenRequest = { token }
-    return fetcher(`/config/token/${tokenType}/update`, { method: 'POST', body: request })
+    return fetcher(ConfigurationApi.endpoints.updateToken.replace('/:tokenType/', `/${tokenType}/`), {
+      method: 'POST',
+      body: request,
+    })
   },
 
-  // Delete token
   deleteToken: async (tokenType: TokenType): Promise<void> => {
-    return fetcher(`/config/token/${tokenType}/delete`, { method: 'POST' })
+    return fetcher(ConfigurationApi.endpoints.deleteToken.replace('/:tokenType/', `/${tokenType}/`), { method: 'POST' })
   },
 
-  // Verify token
   verifyToken: async (tokenType: TokenType, token: string): Promise<VerifyTokenResponse> => {
     const request: TokenRequest = { token }
-    return fetcher(`/config/token/${tokenType}/verify`, { method: 'POST', body: request })
+    return fetcher(ConfigurationApi.endpoints.verifyToken.replace('/:tokenType/', `/${tokenType}/`), {
+      method: 'POST',
+      body: request,
+    })
   },
 }

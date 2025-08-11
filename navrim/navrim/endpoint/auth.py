@@ -72,6 +72,14 @@ async def signin(request: SignInCredentialsRequest) -> NavrimServiceResponse[Ses
     return NavrimServiceResponse.success(SessionResponse(session=session))
 
 
+@router.post("/auth/logout")
+async def logout() -> NavrimServiceResponse[NoData]:
+    client = await get_client()
+    await client.auth.sign_out()
+    Session.delete_session()
+    return NavrimServiceResponse.success(NoData())
+
+
 @router.post("/auth/session")
 async def session() -> NavrimServiceResponse[SessionResponse]:
     session = await get_user_session()

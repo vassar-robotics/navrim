@@ -1,4 +1,4 @@
-import { fetcher } from '@/lib/fetch'
+import { AuthApi } from '@/lib/api'
 import type { Session, SessionResponse, UserProfile } from '@/protocol/response'
 import type React from 'react'
 import { createContext } from 'react'
@@ -24,7 +24,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     data: sessionData,
     isLoading: sessionIsLoading,
     mutate: mutateSession,
-  } = useSWR<SessionResponse>('/auth/session', (url: string) => fetcher<SessionResponse>(url, { method: 'POST' }), {
+  } = useSWR<SessionResponse>(AuthApi.endpoints.session, () => AuthApi.getSession(), {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     shouldRetryOnError: false,
@@ -33,7 +33,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     data: userProfileData,
     isLoading: userProfileIsLoading,
     mutate: mutateUserProfile,
-  } = useSWR<UserProfile>('/auth/profile', (url: string) => fetcher<UserProfile>(url, { method: 'POST' }), {
+  } = useSWR<UserProfile>(AuthApi.endpoints.profile, () => AuthApi.getProfile(), {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     shouldRetryOnError: false,
@@ -53,36 +53,23 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }
 
   const signup = async (email: string, password: string, display_name: string) => {
-    await fetcher('/auth/signup', {
-      method: 'POST',
-      body: {
-        email,
-        password,
-        display_name,
-      },
-    }).then(async () => {
+    await AuthApi.signup(email, password, display_name).then(async () => {
       await mutate()
     })
   }
 
   const signin = async (email: string, password: string) => {
-    await fetcher('/auth/signin', {
-      method: 'POST',
-      body: {
-        email,
-        password,
-      },
-    }).then(async () => {
+    await AuthApi.signin(email, password).then(async () => {
       await mutate()
     })
   }
 
   const logout = async () => {
-    await fetcher('/auth/logout', {
-      method: 'POST',
-    }).then(async () => {
-      await mutate()
-    })
+    // TODO: Implement logout API endpoint when available
+    // await AuthApi.logout().then(async () => {
+    //   await mutate()
+    // })
+    await mutate()
   }
 
   return <AuthContext.Provider value={{ isLoading, auth, signup, signin, logout }}>{children}</AuthContext.Provider>

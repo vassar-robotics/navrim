@@ -45,7 +45,7 @@ export const TokenSettings: React.FC<{
     isLoading: isGettingToken,
     mutate: refreshToken,
   } = useSWR<GetTokenResponse>(
-    `/config/token/${tokenType}/get`,
+    ConfigurationApi.endpoints.getToken.replace('/:tokenType/', `/${tokenType}/`),
     () => ConfigurationApi.getToken(tokenType as TokenType),
     {
       revalidateOnFocus: true,
@@ -60,7 +60,7 @@ export const TokenSettings: React.FC<{
   }, [tokenData])
 
   const { trigger: updateToken, isMutating: isUpdatingToken } = useSWRMutation(
-    `/config/token/${tokenType}/update`,
+    ConfigurationApi.endpoints.updateToken.replace('/:tokenType/', `/${tokenType}/`),
     async (_key: string, { arg }: { arg: string }) => {
       await ConfigurationApi.updateToken(tokenType, arg)
       await refreshToken()
@@ -73,7 +73,7 @@ export const TokenSettings: React.FC<{
   )
 
   const { trigger: deleteToken, isMutating: isDeletingToken } = useSWRMutation(
-    `/config/token/${tokenType}/delete`,
+    ConfigurationApi.endpoints.deleteToken.replace('/:tokenType/', `/${tokenType}/`),
     async () => {
       await ConfigurationApi.deleteToken(tokenType)
       await refreshToken()
@@ -89,7 +89,7 @@ export const TokenSettings: React.FC<{
   )
 
   const { trigger: verifyToken, isMutating: isVerifyingToken } = useSWRMutation(
-    `/config/token/${tokenType}/verify`,
+    ConfigurationApi.endpoints.verifyToken.replace('/:tokenType/', `/${tokenType}/`),
     async (_key: string, { arg }: { arg: string }) => {
       return ConfigurationApi.verifyToken(tokenType, arg)
     },
@@ -104,7 +104,6 @@ export const TokenSettings: React.FC<{
   const isTokenSaved = !!tokenData?.token
   const isProcessing = isGettingToken || isUpdatingToken || isDeletingToken || isVerifyingToken
   const canSave = tokenInput.trim() && !isProcessing
-  const canVerify = tokenInput.trim() && !isProcessing
 
   return (
     <div className="space-y-4 px-6 py-2">
@@ -144,9 +143,9 @@ export const TokenSettings: React.FC<{
               />
               <Button type="submit" disabled={!canSave} className="shrink-0">
                 <Save className="mr-2 h-4 w-4" />
-                {isUpdatingToken ? 'Saving...' : 'Save token'}
+                Save token
               </Button>
-              {canVerify && (
+              {!!tokenInput && (
                 <Button
                   type="button"
                   variant="outline"
@@ -155,7 +154,7 @@ export const TokenSettings: React.FC<{
                   className="shrink-0"
                 >
                   <Shield className="h-4 w-4" />
-                  {isVerifyingToken ? 'Verifying...' : 'Verify'}
+                  Verify
                 </Button>
               )}
               {isTokenSaved && (
@@ -167,7 +166,7 @@ export const TokenSettings: React.FC<{
                   className="shrink-0"
                 >
                   <Trash className="h-4 w-4" />
-                  {isDeletingToken ? 'Deleting...' : 'Delete'}
+                  Delete
                 </Button>
               )}
             </div>

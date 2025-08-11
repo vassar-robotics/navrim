@@ -2,6 +2,7 @@ import PageLayout from '@/components/layout/page-layout'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { AuthApi } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckCircle, Cog } from 'lucide-react'
 import { useState } from 'react'
@@ -32,16 +33,7 @@ export const ForgetPasswordPage: React.FC = () => {
   // Handle form submission
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     try {
-      // TODO: Implement password reset API call when backend endpoint is ready
-      // await fetcher('/auth/reset-password', {
-      //   method: 'POST',
-      //   body: { email: values.email },
-      // })
-
-      // For now, simulate the email being sent
-      console.log('Password reset requested for:', values.email)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
+      await AuthApi.forgotPassword(values.email)
       setIsEmailSent(true)
       toast.success('Password reset email sent!')
     } catch (error) {
