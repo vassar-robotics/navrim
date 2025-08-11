@@ -10,7 +10,7 @@ router = APIRouter(tags=["configuration"])
 
 
 @router.post("/config/token/third-party/get")
-async def get_third_party_tokens(_: NoData) -> NavrimServiceResponse[GetThirdPartyTokensResponse]:
+async def get_third_party_tokens() -> NavrimServiceResponse[GetThirdPartyTokensResponse]:
     app_home = get_home_app_path()
     tokens = {"huggingface": "", "openai": "", "wandb": ""}
     for token_file in tokens.keys():
@@ -24,7 +24,7 @@ async def get_third_party_tokens(_: NoData) -> NavrimServiceResponse[GetThirdPar
 
 
 @router.post("/config/token/huggingface/get")
-async def get_huggingface_token(_: NoData) -> NavrimServiceResponse[GetTokenResponse]:
+async def get_huggingface_token() -> NavrimServiceResponse[GetTokenResponse]:
     app_home = get_home_app_path()
     token_file = app_home / "tokens" / "huggingface.token"
     try:
@@ -46,7 +46,7 @@ async def update_huggingface_token(request: TokenRequest) -> NavrimServiceRespon
 
 
 @router.post("/config/token/huggingface/delete")
-async def delete_huggingface_token(_: NoData) -> NavrimServiceResponse[NoData]:
+async def delete_huggingface_token() -> NavrimServiceResponse[NoData]:
     app_home = get_home_app_path()
     token_file = app_home / "tokens" / "huggingface.token"
     token_file.unlink(missing_ok=True)
@@ -59,7 +59,7 @@ async def verify_huggingface_token(request: TokenRequest) -> NavrimServiceRespon
 
 
 @router.post("/config/token/openai/get")
-async def get_openai_token(_: NoData) -> NavrimServiceResponse[GetTokenResponse]:
+async def get_openai_token() -> NavrimServiceResponse[GetTokenResponse]:
     app_home = get_home_app_path()
     token_file = app_home / "tokens" / "openai.token"
     try:
@@ -81,7 +81,7 @@ async def update_openai_token(request: TokenRequest) -> NavrimServiceResponse[No
 
 
 @router.post("/config/token/openai/delete")
-async def delete_openai_token(_: NoData) -> NavrimServiceResponse[NoData]:
+async def delete_openai_token() -> NavrimServiceResponse[NoData]:
     app_home = get_home_app_path()
     token_file = app_home / "tokens" / "openai.token"
     token_file.unlink(missing_ok=True)
@@ -94,7 +94,7 @@ async def verify_openai_token(request: TokenRequest) -> NavrimServiceResponse[Ve
 
 
 @router.post("/config/token/wandb/get")
-async def get_wandb_token(_: NoData) -> NavrimServiceResponse[GetTokenResponse]:
+async def get_wandb_token() -> NavrimServiceResponse[GetTokenResponse]:
     app_home = get_home_app_path()
     token_file = app_home / "tokens" / "wandb.token"
     try:
@@ -116,7 +116,7 @@ async def update_wandb_token(request: TokenRequest) -> NavrimServiceResponse[NoD
 
 
 @router.post("/config/token/wandb/delete")
-async def delete_wandb_token(_: NoData) -> NavrimServiceResponse[NoData]:
+async def delete_wandb_token() -> NavrimServiceResponse[NoData]:
     app_home = get_home_app_path()
     token_file = app_home / "tokens" / "wandb.token"
     token_file.unlink(missing_ok=True)

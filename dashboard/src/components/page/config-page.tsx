@@ -1,13 +1,17 @@
-import { Key, Play } from 'lucide-react'
+import { Key, Play, Trash } from 'lucide-react'
 import PageLayout from '@/components/layout/page-layout'
-import { HelpCircle, Save, CircleCheck } from 'lucide-react'
+import { HelpCircle, Save, CircleCheck, Shield } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import useSWR from 'swr'
+import { ConfigurationApi, type TokenType } from '@/lib/api/configuration'
+import useSWRMutation from 'swr/mutation'
+import { toast } from 'sonner'
+import { type GetTokenResponse } from '@/protocol/response'
 
 export const ConfigCard: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode }> = ({
   title,
@@ -32,29 +36,87 @@ export const TokenSettings: React.FC<{
   toolTip: string
   placeholder: string
   hint: React.ReactNode
-  tokenType: string
+  tokenType: TokenType
 }> = ({ title, toolTip, placeholder, hint, tokenType }) => {
-  const [token, setToken] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [isTokenSaved, setIsTokenSaved] = useState(false)
+  const [tokenInput, setTokenInput] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+  const {
+    data: tokenData,
+    isLoading: isGettingToken,
+    mutate: refreshToken,
+  } = useSWR<GetTokenResponse>(
+    `/config/token/${tokenType}/get`,
+    () => ConfigurationApi.getToken(tokenType as TokenType),
+    {
+      revalidateOnFocus: true,
+      revalidateOnMount: true,
+      onError: (error) => toast.error(`Failed to get token: ${error.message}`),
+    }
+  )
 
-    // Simulate saving the token
-    setTimeout(() => {
-      setIsLoading(false)
-      setIsTokenSaved(true)
-      console.log('Saving token:', token)
-      // TODO: Implement actual save functionality
-    }, 1000)
-  }
+  // Sync tokenData to tokenInput when the page displays or tokenData changes
+  useEffect(() => {
+    setTokenInput(tokenData?.token || '')
+  }, [tokenData])
+
+  const { trigger: updateToken, isMutating: isUpdatingToken } = useSWRMutation(
+    `/config/token/${tokenType}/update`,
+    async (_key: string, { arg }: { arg: string }) => {
+      await ConfigurationApi.updateToken(tokenType, arg)
+      await refreshToken()
+      return true
+    },
+    {
+      onSuccess: () => toast.success(`${tokenType} token saved successfully`),
+      onError: (error) => toast.error(`Failed to save token: ${error.message}`),
+    }
+  )
+
+  const { trigger: deleteToken, isMutating: isDeletingToken } = useSWRMutation(
+    `/config/token/${tokenType}/delete`,
+    async () => {
+      await ConfigurationApi.deleteToken(tokenType)
+      await refreshToken()
+      return true
+    },
+    {
+      onSuccess: () => {
+        toast.success(`${tokenType} token deleted successfully`)
+        setTokenInput('')
+      },
+      onError: (error) => toast.error(`Failed to delete token: ${error.message}`),
+    }
+  )
+
+  const { trigger: verifyToken, isMutating: isVerifyingToken } = useSWRMutation(
+    `/config/token/${tokenType}/verify`,
+    async (_key: string, { arg }: { arg: string }) => {
+      return ConfigurationApi.verifyToken(tokenType, arg)
+    },
+    {
+      onSuccess: (data) => {
+        data?.valid ? toast.success(`${tokenType} token is valid`) : toast.error(`${tokenType} token is invalid`)
+      },
+      onError: (error) => toast.error(`Failed to verify token: ${error.message}`),
+    }
+  )
+
+  const isTokenSaved = !!tokenData?.token
+  const isProcessing = isGettingToken || isUpdatingToken || isDeletingToken || isVerifyingToken
+  const canSave = tokenInput.trim() && !isProcessing
+  const canVerify = tokenInput.trim() && !isProcessing
 
   return (
     <div className="space-y-4 px-6 py-2">
       <div className="space-y-2">
-        <form id={`${tokenType}-token-form`} onSubmit={handleSubmit} className="space-y-2">
+        <form
+          id={`${tokenType}-token-form`}
+          onSubmit={async (e) => {
+            e.preventDefault()
+            await updateToken(tokenInput)
+          }}
+          className="space-y-2"
+        >
           <div className="space-y-2">
             <label htmlFor={`${tokenType}-token`} className="flex items-center gap-2 text-sm leading-none font-medium">
               {title}
@@ -75,15 +137,39 @@ export const TokenSettings: React.FC<{
                 id={`${tokenType}-token`}
                 type="password"
                 placeholder={placeholder}
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
+                value={tokenInput}
+                onChange={(e) => setTokenInput(e.target.value)}
                 autoComplete="off"
                 className="flex-1"
               />
-              <Button type="submit" disabled={isLoading || !token.trim()} className="shrink-0">
+              <Button type="submit" disabled={!canSave} className="shrink-0">
                 <Save className="mr-2 h-4 w-4" />
-                {isLoading ? 'Saving...' : 'Save token'}
+                {isUpdatingToken ? 'Saving...' : 'Save token'}
               </Button>
+              {canVerify && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={async () => await verifyToken(tokenInput)}
+                  disabled={isVerifyingToken}
+                  className="shrink-0"
+                >
+                  <Shield className="h-4 w-4" />
+                  {isVerifyingToken ? 'Verifying...' : 'Verify'}
+                </Button>
+              )}
+              {isTokenSaved && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={async () => await deleteToken()}
+                  disabled={isDeletingToken}
+                  className="shrink-0"
+                >
+                  <Trash className="h-4 w-4" />
+                  {isDeletingToken ? 'Deleting...' : 'Delete'}
+                </Button>
+              )}
             </div>
           </div>
         </form>

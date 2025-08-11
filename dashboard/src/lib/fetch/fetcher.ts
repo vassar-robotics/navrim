@@ -1,4 +1,4 @@
-import { withTimeout, raiseFromResponse } from '@/lib/fetch/utils'
+import { withTimeout, raiseFromResponse, unwrapNavrimServiceResponse } from '@/lib/fetch/utils'
 
 // const DEFAULT_BASE_URL = window.location.port
 //   ? `http://${window.location.hostname}:${window.location.port}`
@@ -29,6 +29,7 @@ export async function fetcher<T = unknown>(path: string, options: FetcherOptions
   )
   if (!response.ok) {
     return raiseFromResponse(response)
+  } else {
+    return unwrapNavrimServiceResponse(response)
   }
-  return await response.json()
 }

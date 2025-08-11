@@ -45,3 +45,24 @@ export async function raiseFromResponse(response: Response): Promise<never> {
 
   throw new FetcherError(errorMessage, response.status)
 }
+
+export async function unwrapNavrimServiceResponse<T>(response: Response): Promise<T> {
+  const result = await response.json()
+  if (
+    result &&
+    typeof result === 'object' &&
+    'code' in result &&
+    typeof result.code === 'number' &&
+    'message' in result &&
+    typeof result.message === 'string' &&
+    'data' in result &&
+    typeof result.data === 'object'
+  ) {
+    if (result.code !== 0) {
+      throw new FetcherError(result.message || 'API request failed')
+    }
+    return result.data as T
+  } else {
+    return result as T
+  }
+}
