@@ -1,8 +1,8 @@
+import { fetcher } from '@/lib/fetch'
+import type { Session, SessionResponse, UserProfile } from '@/protocol/response'
 import type React from 'react'
 import { createContext } from 'react'
-import type { Session, SessionResponse, UserProfile } from '@/protocol/response'
 import useSWR from 'swr'
-import { fetcher } from '@/lib/fetch'
 
 interface AuthType {
   session: Session

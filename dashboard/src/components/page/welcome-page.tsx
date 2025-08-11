@@ -1,8 +1,7 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/page-layout'
 import { Button } from '@/components/ui/button'
 import {
+  ArrowRight,
   Brain,
   Camera,
   Cog,
@@ -12,9 +11,10 @@ import {
   LayoutDashboard,
   MessageSquare,
   Settings,
-  ArrowRight,
   Sparkles,
 } from 'lucide-react'
+import React from 'react'
+import { Link } from 'react-router-dom'
 
 const WelcomePage: React.FC = () => {
   const features = [

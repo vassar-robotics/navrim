@@ -1,7 +1,7 @@
+import PageLayout from '@/components/layout/page-layout'
+import { Button } from '@/components/ui/button'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import PageLayout from '@/components/layout/page-layout'
 
 export const NotFoundPage: React.FC = () => {
   return (

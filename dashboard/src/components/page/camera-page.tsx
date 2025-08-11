@@ -1,7 +1,7 @@
 import PageLayout from '@/components/layout/page-layout'
-import { Camera } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { Camera } from 'lucide-react'
 
 interface CameraCardProps {
   id: string

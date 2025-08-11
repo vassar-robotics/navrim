@@ -1,5 +1,5 @@
-import React from 'react'
 import PageLayout from '@/components/layout/page-layout'
+import React from 'react'
 
 const TermsPage: React.FC = () => {
   return (

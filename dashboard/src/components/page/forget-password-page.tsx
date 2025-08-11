@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Cog, CheckCircle } from 'lucide-react'
 import PageLayout from '@/components/layout/page-layout'
+import { Button } from '@/components/ui/button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckCircle, Cog } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
+import * as z from 'zod'
 
 // Define the form schema with zod
 const forgotPasswordFormSchema = z.object({

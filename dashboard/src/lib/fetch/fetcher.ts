@@ -1,4 +1,4 @@
-import { withTimeout, raiseFromResponse, unwrapNavrimServiceResponse } from '@/lib/fetch/utils'
+import { raiseFromResponse, unwrapNavrimServiceResponse, withTimeout } from '@/lib/fetch/utils'
 
 // const DEFAULT_BASE_URL = window.location.port
 //   ? `http://${window.location.hostname}:${window.location.port}`

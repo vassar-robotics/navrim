@@ -1,3 +1,14 @@
+import { useAuth } from '@/components/context/auth'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Sidebar,
   SidebarContent,
@@ -8,24 +19,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
-import type React from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import type { LucideIcon } from 'lucide-react'
-import { Cog, CircleGauge, Gamepad2, Database, Brain, Cpu, MessageSquare, Settings, Camera } from 'lucide-react'
-import { useAuth } from '@/components/context/auth'
 import { SidebarFooter } from '@/components/ui/sidebar'
 import { useSidebar } from '@/components/ui/sidebar'
+import type { LucideIcon } from 'lucide-react'
+import { Brain, Camera, CircleGauge, Cog, Cpu, Database, Gamepad2, MessageSquare, Settings } from 'lucide-react'
 import { Bell, CreditCard, Ellipsis, LogOut, UserCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import type React from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 const displayNameFallback = 'John Doe'
 const emailFallback = 'john.doe@example.com'

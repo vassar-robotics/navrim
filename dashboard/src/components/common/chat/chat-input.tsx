@@ -1,7 +1,7 @@
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { ArrowUp } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { ArrowUp } from 'lucide-react'
 import React from 'react'
 
 const ChatInput: React.FC<{

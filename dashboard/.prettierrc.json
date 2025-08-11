@@ -4,6 +4,9 @@
   "semi": false,
   "singleQuote": true,
   "printWidth": 120,
-  "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindStylesheet": "./src/index.css"
+  "plugins": ["prettier-plugin-tailwindcss", "@trivago/prettier-plugin-sort-imports"],
+  "tailwindStylesheet": "./src/index.css",
+  "importOrder": ["^[./]"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

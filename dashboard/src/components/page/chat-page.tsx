@@ -1,11 +1,11 @@
-import type React from 'react'
-import PageLayout from '@/components/layout/page-layout'
 import ChatInput from '@/components/common/chat/chat-input'
-import Suggestions from '@/components/common/chat/suggestions'
-import { useState } from 'react'
 import ChatLogo from '@/components/common/chat/chat-logo'
 import type { MessageType } from '@/components/common/chat/message'
+import Suggestions from '@/components/common/chat/suggestions'
 import Thread from '@/components/common/chat/thread'
+import PageLayout from '@/components/layout/page-layout'
+import type React from 'react'
+import { useState } from 'react'
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<MessageType[]>([])

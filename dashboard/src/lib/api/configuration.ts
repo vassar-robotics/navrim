@@ -1,6 +1,6 @@
 import { fetcher } from '@/lib/fetch'
-import type { GetTokenResponse, VerifyTokenResponse, GetThirdPartyTokensResponse } from '@/protocol/response'
 import type { TokenRequest } from '@/protocol/request'
+import type { GetThirdPartyTokensResponse, GetTokenResponse, VerifyTokenResponse } from '@/protocol/response'
 
 export type TokenType = 'huggingface' | 'openai' | 'wandb'
 
