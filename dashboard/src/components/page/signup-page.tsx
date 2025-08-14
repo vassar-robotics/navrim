@@ -3,8 +3,9 @@ import PageLayout from '@/components/layout/page-layout'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Cog, Mail } from 'lucide-react'
+import { Cog, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -31,7 +32,7 @@ const signupFormSchema = z
 type SignupFormValues = z.infer<typeof signupFormSchema>
 
 export const SignupPage: React.FC = () => {
-  const { auth, signup } = useAuth()
+  const { auth, signup, isLoading } = useAuth()
   const [signupSuccess, setSignupSuccess] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const navigate = useNavigate()
@@ -66,6 +67,63 @@ export const SignupPage: React.FC = () => {
       })
   }
 
+  // Show skeleton while checking authentication status
+  if (isLoading) {
+    return (
+      <PageLayout>
+        <div className="w-full max-w-sm space-y-6">
+          {/* Logo and Title Skeleton */}
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <Skeleton className="h-8 w-8 rounded" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+            <Skeleton className="h-4 w-32" />
+          </div>
+
+          {/* Form Skeleton */}
+          <div className="space-y-4">
+            {/* Display Name Field */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+
+            {/* Email Field */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+
+            {/* Confirm Password Field */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+
+            {/* Terms and Privacy Links */}
+            <Skeleton className="h-4 w-full" />
+
+            {/* Submit Button */}
+            <Skeleton className="h-10 w-full" />
+          </div>
+
+          {/* Sign in link */}
+          <div className="flex items-center justify-center space-x-1">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-12" />
+          </div>
+        </div>
+      </PageLayout>
+    )
+  }
+
   return (
     <PageLayout>
       <div className="w-full max-w-sm space-y-6">
@@ -82,8 +140,8 @@ export const SignupPage: React.FC = () => {
           /* Success Message */
           <div className="space-y-6">
             <div className="flex flex-col items-center space-y-4">
-              <div className="rounded-full bg-primary/10 p-4">
-                <Mail className="h-8 w-8 text-primary" />
+              <div className="flex justify-center">
+                <CheckCircle className="h-12 w-12 text-green-600" />
               </div>
               <div className="space-y-2 text-center">
                 {/* <h3 className="text-lg font-semibold">Verify your email</h3> */}

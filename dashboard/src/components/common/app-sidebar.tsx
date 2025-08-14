@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/sidebar'
 import { SidebarFooter } from '@/components/ui/sidebar'
 import { useSidebar } from '@/components/ui/sidebar'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { LucideIcon } from 'lucide-react'
 import { Brain, Camera, CircleGauge, Cog, Cpu, Database, Gamepad2, MessageSquare, Settings } from 'lucide-react'
 import { Bell, CreditCard, Ellipsis, LogOut, UserCircle } from 'lucide-react'
@@ -95,24 +96,41 @@ const SidebarUser: React.FC = () => {
   )
 }
 
+const SidebarAuthButtons: React.FC = () => {
+  return (
+    <div className="flex flex-col gap-2 p-2">
+      <Button variant="secondary" asChild className="w-full">
+        <Link to="/signin">Sign In</Link>
+      </Button>
+      <Button asChild className="w-full">
+        <Link to="/signup">Sign Up</Link>
+      </Button>
+    </div>
+  )
+}
+
+const SidebarFooterSkeleton: React.FC = () => {
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton size="lg" className="pointer-events-none">
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <Skeleton className="h-4 w-24 mb-1" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+          <Skeleton className="ml-auto h-4 w-4 rounded-full" />
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  )
+}
+
 const AppSidebarFooter: React.FC = () => {
-  const { auth } = useAuth()
+  const { auth, isLoading } = useAuth()
 
   return (
     <SidebarFooter>
-      {/* User Section */}
-      {auth?.session ? (
-        <SidebarUser />
-      ) : (
-        <div className="flex flex-col gap-2 p-2">
-          <Button variant="secondary" asChild className="w-full">
-            <Link to="/signin">Sign In</Link>
-          </Button>
-          <Button asChild className="w-full">
-            <Link to="/signup">Sign Up</Link>
-          </Button>
-        </div>
-      )}
+      {isLoading ? <SidebarFooterSkeleton /> : auth?.session ? <SidebarUser /> : <SidebarAuthButtons />}
     </SidebarFooter>
   )
 }

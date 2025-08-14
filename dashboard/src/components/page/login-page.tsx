@@ -3,6 +3,7 @@ import PageLayout from '@/components/layout/page-layout'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Cog } from 'lucide-react'
 import { useEffect } from 'react'
@@ -21,7 +22,7 @@ const loginFormSchema = z.object({
 type LoginFormValues = z.infer<typeof loginFormSchema>
 
 export const LoginPage: React.FC = () => {
-  const { auth, signin } = useAuth()
+  const { auth, signin, isLoading } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -50,6 +51,51 @@ export const LoginPage: React.FC = () => {
       .catch((error) => {
         toast.error(error.message)
       })
+  }
+
+  // Show skeleton while checking authentication status
+  if (isLoading) {
+    return (
+      <PageLayout>
+        <div className="w-full max-w-sm space-y-6">
+          {/* Logo and Title Skeleton */}
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <Skeleton className="h-8 w-8 rounded" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+            <Skeleton className="h-4 w-32" />
+          </div>
+
+          {/* Form Skeleton */}
+          <div className="space-y-4">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+
+            {/* Forgot password link */}
+            <Skeleton className="h-4 w-28" />
+
+            {/* Submit Button */}
+            <Skeleton className="h-10 w-full" />
+          </div>
+
+          {/* Sign up link */}
+          <div className="flex items-center justify-center space-x-1">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-12" />
+          </div>
+        </div>
+      </PageLayout>
+    )
   }
 
   return (
