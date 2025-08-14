@@ -8,10 +8,35 @@ from navrim.config import config
 from navrim.protocol import NavrimServiceResponse, NoData
 from navrim.protocol.request import ResetPasswordRequest, SignInCredentialsRequest, SignUpCredentialsRequest
 from navrim.protocol.response import Session, SessionResponse, UserProfile
-from navrim.service.supabase_api import get_client, get_user_session
+from navrim.service.supabase_api import get_client, get_client_and_user_session, get_user_session
 from navrim.util import get_local_ip_address
 
 router = APIRouter(tags=["auth"])
+
+
+"""
+Run following SQL to create function and triggers:
+
+CREATE FUNCTION public.handle_new_user () RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER
+SET
+  search_path = '' AS $$
+BEGIN
+  INSERT INTO public.profiles (id, display_name)
+  VALUES (
+    NEW.id,
+    COALESCE(
+      NEW.raw_user_meta_data ->> 'display_name',
+      'John Doe'
+    )
+  );
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users FOR EACH ROW
+EXECUTE PROCEDURE public.handle_new_user ();
+"""
 
 
 @router.post("/auth/signup")
@@ -46,12 +71,15 @@ async def signup(request: SignUpCredentialsRequest) -> NavrimServiceResponse[NoD
 @router.post("/auth/signin")
 async def signin(request: SignInCredentialsRequest) -> NavrimServiceResponse[SessionResponse]:
     client = await get_client()
-    response = await client.auth.sign_in_with_password(
-        {
-            "email": request.email,
-            "password": request.password,
-        }
-    )
+    try:
+        response = await client.auth.sign_in_with_password(
+            {
+                "email": request.email,
+                "password": request.password,
+            }
+        )
+    except AuthApiError as e:
+        raise HTTPException(status_code=401, detail=e.message)
     if response.session is None:
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if response.user is None or response.user.email is None:
@@ -81,7 +109,7 @@ async def logout() -> NavrimServiceResponse[NoData]:
 
 
 @router.post("/auth/session")
-async def session() -> NavrimServiceResponse[SessionResponse]:
+async def get_session() -> NavrimServiceResponse[SessionResponse]:
     session = await get_user_session()
     return NavrimServiceResponse.success(
         SessionResponse(
@@ -98,8 +126,11 @@ async def session() -> NavrimServiceResponse[SessionResponse]:
 
 
 @router.post("/auth/profile")
-async def profile() -> NavrimServiceResponse[UserProfile]:
-    return NavrimServiceResponse.success(UserProfile(display_name="haha"))
+async def get_profile() -> NavrimServiceResponse[UserProfile]:
+    client, session = await get_client_and_user_session()
+    response = await client.table("profiles").select("display_name").eq("id", session.user.id).single().execute()
+    display_name = response.data.get("display_name") if response.data else "John Doe"
+    return NavrimServiceResponse.success(UserProfile(display_name=display_name))
 
 
 @router.post("/auth/forgot-password")

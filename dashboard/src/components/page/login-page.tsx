@@ -5,8 +5,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Cog } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 // Define the form schema with zod
@@ -19,7 +21,15 @@ const loginFormSchema = z.object({
 type LoginFormValues = z.infer<typeof loginFormSchema>
 
 export const LoginPage: React.FC = () => {
-  const { signin } = useAuth()
+  const { auth, signin } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (auth?.userProfile) {
+      toast.success('Already logged in')
+      navigate('/')
+    }
+  }, [auth])
 
   // Initialize the form with react-hook-form and zod resolver
   const form = useForm<LoginFormValues>({
@@ -33,6 +43,13 @@ export const LoginPage: React.FC = () => {
   // Handle form submission
   const onSubmit = async (values: LoginFormValues) => {
     await signin(values.email, values.password)
+      .then(() => {
+        toast.success('Signed in successfully')
+        navigate('/')
+      })
+      .catch((error) => {
+        toast.error(error.message)
+      })
   }
 
   return (

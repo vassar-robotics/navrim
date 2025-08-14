@@ -27,6 +27,7 @@ class GetServerStatusResponse(BaseModel):
     port: int
     hostname: str
 
+
 class Session(BaseModel):
     user_id: str
     user_email: str

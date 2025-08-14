@@ -2,14 +2,18 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from loguru import logger
+
 from navrim.util import get_project_path
 
 pydantic2ts = shutil.which("pydantic2ts")
 json2ts = shutil.which("json2ts")
+assert pydantic2ts is not None, "pydantic2ts is not installed"
+assert json2ts is not None, "json2ts is not installed"
 
 
 def pydantic_to_typescript(source_path: Path, target_path: Path):
-    print(
+    logger.info(
         " ".join(
             [
                 pydantic2ts,
@@ -18,7 +22,7 @@ def pydantic_to_typescript(source_path: Path, target_path: Path):
                 "--output",
                 target_path.as_posix(),
                 "--json2ts-cmd",
-                json2ts
+                json2ts,
             ]
         )
     )

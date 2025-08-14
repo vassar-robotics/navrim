@@ -91,3 +91,11 @@ async def get_user_session() -> gotrue.Session:
     if session is None:
         raise HTTPException(status_code=401, detail="User is not authenticated")
     return session
+
+
+async def get_client_and_user_session() -> tuple[AsyncClient, gotrue.Session]:
+    client = await get_client()
+    session = await get_user_session()
+    if session is None:
+        raise HTTPException(status_code=401, detail="User is not authenticated")
+    return client, session
