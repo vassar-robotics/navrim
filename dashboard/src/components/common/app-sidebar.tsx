@@ -27,13 +27,14 @@ import { Brain, Camera, CircleGauge, Cog, Cpu, Database, Gamepad2, MessageSquare
 import { Bell, CreditCard, Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import type React from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { toast } from 'sonner'
 
 const displayNameFallback = 'John Doe'
 const emailFallback = 'john.doe@example.com'
 
 const SidebarUser: React.FC = () => {
   const { isMobile } = useSidebar()
-  const { auth } = useAuth()
+  const { auth, logout } = useAuth()
 
   return (
     <SidebarMenu>
@@ -75,17 +76,19 @@ const SidebarUser: React.FC = () => {
                 <UserCircle className="mr-2 size-4" />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard className="mr-2 size-4" />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell className="mr-2 size-4" />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                logout()
+                  .then(() => {
+                    toast.success('Logged out successfully')
+                  })
+                  .catch((error) => {
+                    toast.error(error.message)
+                  })
+              }}
+            >
               <LogOut className="mr-2 size-4" />
               Log out
             </DropdownMenuItem>

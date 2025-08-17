@@ -1,4 +1,4 @@
-import { ProtectedRoute } from '@/components/context/auth/protected-route'
+import { ProtectedRoute } from '@/components/common/protected-route'
 import RootLayout from '@/components/layout/root-layout'
 import { CameraPage } from '@/components/page/camera-page'
 import ChatPage from '@/components/page/chat-page'

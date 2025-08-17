@@ -65,11 +65,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }
 
   const logout = async () => {
-    // TODO: Implement logout API endpoint when available
-    // await AuthApi.logout().then(async () => {
-    //   await mutate()
-    // })
-    await mutate()
+    await AuthApi.logout().then(async () => {
+      await mutate()
+    })
   }
 
   return <AuthContext.Provider value={{ isLoading, auth, signup, signin, logout }}>{children}</AuthContext.Provider>
