@@ -66,3 +66,12 @@ class SessionResponse(BaseModel):
 
 class UserProfile(BaseModel):
     display_name: str
+
+
+class DatasetItemResponse(BaseModel):
+    name: str
+    is_remote: bool
+
+
+class ListDatasetsResponse(BaseModel):
+    datasets: list[DatasetItemResponse]

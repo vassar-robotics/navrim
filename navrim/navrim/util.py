@@ -20,6 +20,10 @@ def get_home_app_path() -> Path:
     return app_home
 
 
+def get_app_datasets_path() -> Path:
+    return get_home_app_path() / "datasets"
+
+
 def get_local_ip_address() -> str:
     return socket.gethostbyname(socket.gethostname())
 

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
 
-from navrim.endpoint import router_auth, router_configuration, router_status
+from navrim.endpoint import router_auth, router_configuration, router_dataset, router_status
 from navrim.protocol import NavrimServiceResponse, codes
 
 app = FastAPI()
@@ -21,6 +21,7 @@ app.add_middleware(
 app.include_router(router_configuration)
 app.include_router(router_status)
 app.include_router(router_auth)
+app.include_router(router_dataset)
 
 
 @app.exception_handler(HTTPException)

@@ -21,12 +21,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { ConfigurationApi } from '@/lib/api'
+import { DatasetApi } from '@/lib/api/dataset'
+import type { GetTokenResponse, ListDatasetsResponse } from '@/protocol/response'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus } from 'lucide-react'
+import { AlertTriangle, Cloud, Plus } from 'lucide-react'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import useSWR from 'swr'
 import * as z from 'zod'
 
 const AddFromHubDialog: React.FC = () => {
@@ -177,7 +181,56 @@ const DatasetPageHeader: React.FC = () => {
   )
 }
 
-const DatasetTable: React.FC = () => {
+const TokenWarningBanner: React.FC = () => {
+  return (
+    <div className="mb-4 w-full flex items-center gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm">
+      <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-500" />
+      <div className="flex flex-1 items-center justify-between">
+        <span className="text-amber-900 dark:text-amber-200">
+          Hugging Face token is not set. Some features may not work properly.
+        </span>
+        <Link
+          to="/configuration"
+          className="ml-4 font-medium text-amber-700 underline hover:no-underline dark:text-amber-400"
+        >
+          Go to Settings
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+const DatasetRow: React.FC<{ datasetName: string; isRemote: boolean }> = ({ datasetName, isRemote }) => {
+  return (
+    <TableRow>
+      <TableCell className="w-[50px]" />
+      <TableCell>
+        <div className="flex items-center gap-2">
+          {datasetName}
+          {isRemote && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Cloud className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Remote dataset</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
+      </TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+    </TableRow>
+  )
+}
+
+const DatasetTable: React.FC<{ datasets: ListDatasetsResponse['datasets'] }> = ({ datasets }) => {
   return (
     <Table className="bg-background rounded-lg">
       <TableHeader>
@@ -191,17 +244,40 @@ const DatasetTable: React.FC = () => {
           <TableCell className="text-muted-foreground">Image Keys</TableCell>
         </TableRow>
       </TableHeader>
-      <TableBody></TableBody>
+      <TableBody>
+        {datasets.map((dataset) => (
+          <DatasetRow key={dataset.name} datasetName={dataset.name} isRemote={dataset.is_remote} />
+        ))}
+      </TableBody>
     </Table>
   )
 }
 
 export const DatasetPage: React.FC = () => {
+  const { data: tokenData, error: tokenError } = useSWR<GetTokenResponse>(
+    ConfigurationApi.endpoints.getToken.replace('/:tokenType/', `/huggingface/`),
+    () => ConfigurationApi.getToken('huggingface'),
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+    }
+  )
+  const hasToken = !tokenError && tokenData?.token && tokenData.token.trim() !== ''
+  const { data: datasetsData } = useSWR<ListDatasetsResponse>(
+    DatasetApi.endpoints.listDatasets,
+    () => DatasetApi.listDatasets(),
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+    }
+  )
+
   return (
     <PageLayout className="items-start">
       <div className="container flex flex-1 flex-col items-start">
         <DatasetPageHeader />
-        <DatasetTable />
+        {!hasToken && <TokenWarningBanner />}
+        <DatasetTable datasets={datasetsData?.datasets || []} />
       </div>
     </PageLayout>
   )

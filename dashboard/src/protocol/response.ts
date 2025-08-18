@@ -5,6 +5,10 @@
 /* Do not modify it by hand - just update the pydantic models and then re-run the script
 */
 
+export interface DatasetItemResponse {
+  name: string
+  is_remote: boolean
+}
 export interface GetServerStatusResponse {
   status: string
   ip_address: string
@@ -18,6 +22,9 @@ export interface GetThirdPartyTokensResponse {
 }
 export interface GetTokenResponse {
   token: string
+}
+export interface ListDatasetsResponse {
+  datasets: DatasetItemResponse[]
 }
 export interface Session {
   user_id: string
