@@ -23,3 +23,12 @@ class SignInCredentialsRequest(EmailPasswordRequest):
 
 class ResetPasswordRequest(EmailRequest):
     pass
+
+
+class GetDatasetInfoRequest(BaseModel):
+    dataset_name: str
+    is_remote: bool
+
+
+class BrowseDatasetRequest(GetDatasetInfoRequest):
+    path: str

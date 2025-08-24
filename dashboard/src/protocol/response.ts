@@ -5,6 +5,22 @@
 /* Do not modify it by hand - just update the pydantic models and then re-run the script
 */
 
+export interface BrowseDatasetResponse {
+  name: string
+  is_remote: boolean
+  path: string
+  files: string[]
+  directories: string[]
+}
+export interface DatasetInfoResponse {
+  name: string
+  is_remote: boolean
+  version: string
+  robot_type: string
+  dof: number
+  episode_count: number
+  image_count: number
+}
 export interface DatasetItemResponse {
   name: string
   is_remote: boolean

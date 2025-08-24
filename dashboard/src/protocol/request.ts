@@ -5,12 +5,21 @@
 /* Do not modify it by hand - just update the pydantic models and then re-run the script
 */
 
+export interface BrowseDatasetRequest {
+  dataset_name: string
+  is_remote: boolean
+  path: string
+}
 export interface EmailPasswordRequest {
   email: string
   password: string
 }
 export interface EmailRequest {
   email: string
+}
+export interface GetDatasetInfoRequest {
+  dataset_name: string
+  is_remote: boolean
 }
 export interface ResetPasswordRequest {
   email: string

@@ -19,5 +19,5 @@ def list_remote_datasets():
         whoami = hf_api.whoami()
         hf_name = whoami["name"]
         hf_datasets = hf_api.list_datasets(author=hf_name)
-        return [dataset.id.split("/")[-1] for dataset in hf_datasets]
+        return [dataset.id for dataset in hf_datasets]
     return []

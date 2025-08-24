@@ -27,7 +27,7 @@ export const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (auth?.userProfile) {
-      toast.success('Already logged in')
+      toast.success('Signed in successfully')
       navigate('/')
     }
   }, [auth])
@@ -43,11 +43,7 @@ export const LoginPage: React.FC = () => {
 
   // Handle form submission
   const onSubmit = async (values: LoginFormValues) => {
-    await signin(values.email, values.password)
-      .then(() => {
-        toast.success('Signed in successfully')
-        navigate('/')
-      })
+    await signin(values.email, values.password) // it's unnessesary to redirect to home page because it's already redirected in useEffect
       .catch((error) => {
         toast.error(error.message)
       })

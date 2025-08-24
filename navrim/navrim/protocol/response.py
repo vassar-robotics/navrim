@@ -73,5 +73,21 @@ class DatasetItemResponse(BaseModel):
     is_remote: bool
 
 
+class DatasetInfoResponse(DatasetItemResponse):
+    version: str
+    robot_type: str
+    dof: int
+    episode_count: int
+    image_count: int
+
+
+class BrowseDatasetResponse(BaseModel):
+    name: str
+    is_remote: bool
+    path: str
+    files: list[str]
+    directories: list[str]
+
+
 class ListDatasetsResponse(BaseModel):
     datasets: list[DatasetItemResponse]
