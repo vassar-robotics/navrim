@@ -5,6 +5,15 @@
 /* Do not modify it by hand - just update the pydantic models and then re-run the script
 */
 
+export type BackgroundTaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+
+export interface BackgroundTask {
+  id: string
+  name: string
+  status: BackgroundTaskStatus
+  description: string
+  progress: number | null
+}
 export interface BrowseDatasetResponse {
   name: string
   is_remote: boolean
@@ -38,6 +47,9 @@ export interface GetThirdPartyTokensResponse {
 }
 export interface GetTokenResponse {
   token: string
+}
+export interface ListBackgroundTasksResponse {
+  tasks: BackgroundTask[]
 }
 export interface ListDatasetsResponse {
   datasets: DatasetItemResponse[]

@@ -10,12 +10,18 @@ export interface BrowseDatasetRequest {
   is_remote: boolean
   path: string
 }
+export interface DatasetRequest {
+  dataset_name: string
+}
 export interface EmailPasswordRequest {
   email: string
   password: string
 }
 export interface EmailRequest {
   email: string
+}
+export interface FetchDatasetRequest {
+  dataset_name: string
 }
 export interface GetDatasetInfoRequest {
   dataset_name: string

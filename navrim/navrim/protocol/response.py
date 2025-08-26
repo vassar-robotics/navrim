@@ -3,6 +3,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from navrim.core.background import BackgroundTaskStatus
 from navrim.util import get_home_app_path
 
 
@@ -91,3 +92,15 @@ class BrowseDatasetResponse(BaseModel):
 
 class ListDatasetsResponse(BaseModel):
     datasets: list[DatasetItemResponse]
+
+
+class BackgroundTask(BaseModel):
+    id: str
+    name: str
+    status: BackgroundTaskStatus
+    description: str
+    progress: int | None
+
+
+class ListBackgroundTasksResponse(BaseModel):
+    tasks: list[BackgroundTask]

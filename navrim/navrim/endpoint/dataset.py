@@ -4,9 +4,10 @@ from asyncio import gather, to_thread
 from fastapi import APIRouter, HTTPException
 from natsort import natsorted
 
-from navrim.core.dataset import list_local_datasets, list_remote_datasets
-from navrim.protocol import NavrimServiceResponse
-from navrim.protocol.request import BrowseDatasetRequest, GetDatasetInfoRequest
+from navrim.core.background import BackgroundTaskCategory, get_task_queue
+from navrim.core.dataset import fetch_dataset_from_hub, list_local_datasets, list_remote_datasets
+from navrim.protocol import NavrimServiceResponse, NoData
+from navrim.protocol.request import BrowseDatasetRequest, FetchDatasetRequest, GetDatasetInfoRequest
 from navrim.protocol.response import (
     BrowseDatasetResponse,
     DatasetInfoResponse,
@@ -72,3 +73,18 @@ async def browse_dataset(request: BrowseDatasetRequest) -> NavrimServiceResponse
             directories=directories,
         )
     )
+
+
+@router.post("/dataset/fetch")
+async def fetch_dataset(request: FetchDatasetRequest) -> NavrimServiceResponse[NoData]:
+    local_dataset_name = request.dataset_name.replace("/", "--")
+    local_dataset_path = get_app_datasets_path() / local_dataset_name
+    if local_dataset_path.is_dir():
+        raise HTTPException(status_code=400, detail=f"Dataset {request.dataset_name} already exists")
+    get_task_queue(BackgroundTaskCategory.FETCH_DATASET).add_task(
+        fetch_dataset_from_hub,
+        request.dataset_name,
+        name_=f"Fetch dataset {request.dataset_name}",
+        description_=f"Fetch dataset {request.dataset_name} from Hugging Face",
+    )
+    return NavrimServiceResponse.success(NoData())

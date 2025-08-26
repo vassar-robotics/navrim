@@ -25,8 +25,15 @@ class ResetPasswordRequest(EmailRequest):
     pass
 
 
-class GetDatasetInfoRequest(BaseModel):
+class DatasetRequest(BaseModel):
     dataset_name: str
+
+
+class FetchDatasetRequest(DatasetRequest):
+    pass
+
+
+class GetDatasetInfoRequest(DatasetRequest):
     is_remote: bool
 
 
