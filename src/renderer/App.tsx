@@ -132,6 +132,15 @@ function EnvironmentSetup() {
         throw new Error(result.error || 'Failed to install navrim-lerobot');
       }
 
+      // Install gotrue dependency
+      result = await window.electron.ipcRenderer.invoke(
+        'install-package',
+        'gotrue',
+      );
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to install gotrue');
+      }
+
       setProgress((prev) => ({
         ...prev,
         installingUv: false,
