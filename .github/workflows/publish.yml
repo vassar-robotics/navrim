@@ -42,10 +42,21 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
+          cd release/app
+          pnpm install --frozen-lockfile
+          cd ../..
 
       - name: Build application
         run: pnpm build
+
+      - name: Prepare build directories
+        run: |
+          # Copy built files to release/app/dist
+          cp -r dist/* release/app/dist/ 2>/dev/null || true
+          # Ensure the directory structure is correct
+          ls -la release/app/
 
       - name: Build with ToDesktop
         env:
@@ -54,6 +65,13 @@ jobs:
         run: |
           # Install ToDesktop CLI
           npm install -g @todesktop/cli
-          
-          # Build with ToDesktop
-          todesktop build
+
+          # Build with ToDesktop (without code signing for CI)
+          todesktop build --code-sign=false
+
+      - name: List builds
+        env:
+          TODESKTOP_EMAIL: ${{ secrets.TODESKTOP_EMAIL }}
+          TODESKTOP_ACCESS_TOKEN: ${{ secrets.TODESKTOP_ACCESS_TOKEN }}
+        run: |
+          todesktop builds
