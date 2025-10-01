@@ -12,6 +12,7 @@ export class EnvironmentManager {
   private static instance: EnvironmentManager;
   private envPath: string;
   private phosphobotProcess: ChildProcess | null = null;
+  private logCallback: ((message: string) => void) | null = null;
 
   constructor() {
     // Store virtual environment in app's user data directory
@@ -26,6 +27,17 @@ export class EnvironmentManager {
     return this.instance;
   }
 
+  setLogCallback(callback: ((message: string) => void) | null) {
+    this.logCallback = callback;
+  }
+
+  private log(message: string) {
+    console.log(message); // Keep console.log for debugging
+    if (this.logCallback) {
+      this.logCallback(message);
+    }
+  }
+
   private getEnhancedEnv(): NodeJS.ProcessEnv {
     // Common uv installation paths
     const commonPaths = [
@@ -36,33 +48,36 @@ export class EnvironmentManager {
     ];
 
     // Add common paths to PATH
-    const enhancedPath = commonPaths.join(path.delimiter) + path.delimiter + (process.env.PATH || '');
+    const enhancedPath =
+      commonPaths.join(path.delimiter) +
+      path.delimiter +
+      (process.env.PATH || '');
 
     return {
       ...process.env,
-      PATH: enhancedPath
+      PATH: enhancedPath,
     };
   }
 
   async checkUvInstalled(): Promise<boolean> {
     try {
+      this.log('Checking if uv is installed...');
       const { stdout } = await execAsync('uv --version', {
-        env: this.getEnhancedEnv()
+        env: this.getEnhancedEnv(),
       });
-      console.log('UV version:', stdout.trim());
+      this.log(`UV version: ${stdout.trim()}`);
       return true;
     } catch (error) {
-      console.log('UV not found:', error);
+      this.log(`UV not found: ${error}`);
       return false;
     }
   }
 
   async installUv(): Promise<void> {
-
     // Check if uv is already installed
     const isInstalled = await this.checkUvInstalled();
     if (isInstalled) {
-      console.log('UV is already installed');
+      this.log('UV is already installed');
       return;
     }
 
@@ -74,24 +89,25 @@ export class EnvironmentManager {
       installCommand = 'curl -LsSf https://astral.sh/uv/install.sh | sh';
     } else if (platform === 'win32') {
       // Windows uses PowerShell
-      installCommand = 'powershell -ExecutionPolicy ByPass -Command "irm https://astral.sh/uv/install.ps1 | iex"';
+      installCommand =
+        'powershell -ExecutionPolicy ByPass -Command "irm https://astral.sh/uv/install.ps1 | iex"';
     } else {
       throw new Error(`Unsupported platform: ${platform}`);
     }
 
-    console.log(`Installing UV with command: ${installCommand}`);
+    this.log(`Installing UV with command: ${installCommand}`);
 
     try {
       const { stdout, stderr } = await execAsync(installCommand, {
         shell: true,
-        env: this.getEnhancedEnv()
+        env: this.getEnhancedEnv(),
       } as any);
 
       if (stderr && !stderr.includes('warning')) {
-        console.error('UV installation stderr:', stderr);
+        this.log(`UV installation stderr: ${stderr}`);
       }
 
-      console.log('UV installation stdout:', stdout);
+      this.log(`UV installation stdout: ${stdout}`);
 
       // Verify installation succeeded
       const isInstalled = await this.checkUvInstalled();
@@ -99,7 +115,7 @@ export class EnvironmentManager {
         throw new Error('UV installation completed but verification failed');
       }
     } catch (error: any) {
-      console.error('Failed to install UV:', error);
+      this.log(`Failed to install UV: ${error}`);
       throw new Error(`Failed to install UV: ${error.message}`);
     }
   }
@@ -108,52 +124,60 @@ export class EnvironmentManager {
     try {
       // Check if environment already exists
       if (fs.existsSync(this.envPath)) {
-        console.log(`Virtual environment already exists at ${this.envPath}`);
+        this.log(`Virtual environment already exists at ${this.envPath}`);
         return;
       }
 
       // Create virtual environment with Python 3.12
-      const { stdout, stderr } = await execAsync(`uv venv -p 3.10 "${this.envPath}"`, {
-        shell: true,
-        env: this.getEnhancedEnv()
-      } as any);
+      const { stdout, stderr } = await execAsync(
+        `uv venv -p 3.10 "${this.envPath}"`,
+        {
+          shell: true,
+          env: this.getEnhancedEnv(),
+        } as any,
+      );
 
       if (stderr && !stderr.includes('warning')) {
-        console.error('Create venv stderr:', stderr);
+        this.log(`Create venv stderr: ${stderr}`);
       }
 
-      console.log('Virtual environment created:', stdout);
+      this.log(`Virtual environment created: ${stdout}`);
     } catch (error: any) {
-      console.error('Failed to create virtual environment:', error);
+      this.log(`Failed to create virtual environment: ${error}`);
       throw new Error(`Failed to create virtual environment: ${error.message}`);
     }
   }
 
-  async installPackage(packageName: string = 'navrim-phosphobot'): Promise<void> {
+  async installPackage(
+    packageName: string = 'navrim-phosphobot',
+  ): Promise<void> {
     try {
       // Use uv pip install to install package in virtual environment
       const command = `uv pip install -U ${packageName}`;
 
-      console.log(`Installing package: ${packageName}`);
+      this.log(`Installing package: ${packageName}`);
+      this.log(`Running command: ${command}`);
 
       const { stdout, stderr } = await execAsync(command, {
         shell: true,
         env: {
           ...this.getEnhancedEnv(),
           VIRTUAL_ENV: this.envPath,
-          UV_PROJECT_ENVIRONMENT: this.envPath
-        }
+          UV_PROJECT_ENVIRONMENT: this.envPath,
+        },
       } as any);
 
+      if (stdout) {
+        this.log(`Package installation output: ${stdout}`);
+      }
+
       if (stderr && !stderr.includes('warning')) {
-        console.error('Package installation stderr:', stderr);
+        this.log(`Package installation stderr: ${stderr}`);
       }
 
       await this.checkPackageVersion(packageName);
-
-      console.log('Package installation stdout:', stdout);
     } catch (error: any) {
-      console.error('Failed to install package:', error);
+      this.log(`Failed to install package: ${error}`);
       throw new Error(`Failed to install package: ${error.message}`);
     }
   }
@@ -164,11 +188,11 @@ export class EnvironmentManager {
       env: {
         ...this.getEnhancedEnv(),
         VIRTUAL_ENV: this.envPath,
-        UV_PROJECT_ENVIRONMENT: this.envPath
-      }
+        UV_PROJECT_ENVIRONMENT: this.envPath,
+      },
     } as any);
 
-    console.log(`${packageName} version:`, stdout.toString());
+    this.log(`${packageName} version: ${stdout.toString()}`);
   }
 
   async checkEnvironmentReady(): Promise<{
@@ -188,19 +212,21 @@ export class EnvironmentManager {
           env: {
             ...this.getEnhancedEnv(),
             VIRTUAL_ENV: this.envPath,
-            UV_PROJECT_ENVIRONMENT: this.envPath
-          }
+            UV_PROJECT_ENVIRONMENT: this.envPath,
+          },
         } as any);
-        packageInstalled = stdout.includes('navrim-phosphobot') && stdout.includes('navrim-lerobot');
+        packageInstalled =
+          stdout.includes('navrim-phosphobot') &&
+          stdout.includes('navrim-lerobot');
       } catch (error) {
-        console.error('Failed to check package installation:', error);
+        this.log(`Failed to check package installation: ${error}`);
       }
     }
 
     return {
       uvInstalled,
       envExists,
-      packageInstalled
+      packageInstalled,
     };
   }
 
@@ -208,16 +234,17 @@ export class EnvironmentManager {
     try {
       // Check if phosphobot is already running
       if (this.phosphobotProcess && !this.phosphobotProcess.killed) {
-        console.log('Phosphobot is already running');
+        this.log('Phosphobot is already running');
         return { success: true };
       }
 
       // Determine the phosphobot executable path
-      const phosphobotPath = process.platform === 'win32'
-        ? path.join(this.envPath, 'Scripts', 'phosphobot.exe')
-        : path.join(this.envPath, 'bin', 'phosphobot');
+      const phosphobotPath =
+        process.platform === 'win32'
+          ? path.join(this.envPath, 'Scripts', 'phosphobot.exe')
+          : path.join(this.envPath, 'bin', 'phosphobot');
 
-      console.log(`Starting phosphobot from: ${phosphobotPath}`);
+      this.log(`Starting phosphobot from: ${phosphobotPath}`);
 
       // Spawn phosphobot process
       const enhancedEnv = this.getEnhancedEnv();
@@ -225,27 +252,30 @@ export class EnvironmentManager {
         env: {
           ...enhancedEnv,
           VIRTUAL_ENV: this.envPath,
-          PATH: process.platform === 'win32'
-            ? `${path.join(this.envPath, 'Scripts')}${path.delimiter}${enhancedEnv.PATH}`
-            : `${path.join(this.envPath, 'bin')}${path.delimiter}${enhancedEnv.PATH}`
+          PATH:
+            process.platform === 'win32'
+              ? `${path.join(this.envPath, 'Scripts')}${path.delimiter}${enhancedEnv.PATH}`
+              : `${path.join(this.envPath, 'bin')}${path.delimiter}${enhancedEnv.PATH}`,
         },
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
       });
 
       this.phosphobotProcess.stdout?.on('data', (data) => {
-        console.log(`| Phosphobot STDOUT | ${data.toString().trim()}`);
+        this.log(`| Phosphobot STDOUT | ${data.toString().trim()}`);
       });
 
       this.phosphobotProcess.stderr?.on('data', (data) => {
-        console.error(`| Phosphobot STDERR | ${data.toString().trim()}`);
+        this.log(`| Phosphobot STDERR | ${data.toString().trim()}`);
       });
 
       this.phosphobotProcess.on('error', (error) => {
-        console.error('Phosphobot process error:', error);
+        this.log(`Phosphobot process error: ${error}`);
       });
 
       this.phosphobotProcess.on('exit', (code, signal) => {
-        console.log(`Phosphobot process exited with code ${code} and signal ${signal}`);
+        this.log(
+          `Phosphobot process exited with code ${code} and signal ${signal}`,
+        );
         this.phosphobotProcess = null;
       });
 
@@ -258,14 +288,14 @@ export class EnvironmentManager {
 
       return { success: true };
     } catch (error: any) {
-      console.error('Failed to run phosphobot:', error);
+      this.log(`Failed to run phosphobot: ${error}`);
       return { success: false, error: error.message };
     }
   }
 
   stopPhosphobot(): void {
     if (this.phosphobotProcess && !this.phosphobotProcess.killed) {
-      console.log('Stopping phosphobot process');
+      this.log('Stopping phosphobot process');
       this.phosphobotProcess.kill();
       this.phosphobotProcess = null;
     }

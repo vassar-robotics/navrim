@@ -9,7 +9,10 @@ export type Channels =
   | 'env-status'
   | 'install-package'
   | 'run-phosphobot'
-  | 'restart-copilotkit';
+  | 'restart-copilotkit'
+  | 'subscribe-logs'
+  | 'unsubscribe-logs'
+  | 'log-message';
 
 const electronHandler = {
   ipcRenderer: {

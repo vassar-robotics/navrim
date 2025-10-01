@@ -10,7 +10,7 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-const todesktop = require("@todesktop/runtime");
+const todesktop = require('@todesktop/runtime');
 
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -22,6 +22,17 @@ todesktop.init();
 let mainWindow: BrowserWindow | null = null;
 const copilotKitServer = new CopilotKitServer();
 const envManager = EnvironmentManager.getInstance();
+
+// Set up log streaming
+ipcMain.on('subscribe-logs', (event) => {
+  envManager.setLogCallback((message: string) => {
+    event.sender.send('log-message', message);
+  });
+});
+
+ipcMain.on('unsubscribe-logs', () => {
+  envManager.setLogCallback(null);
+});
 
 ipcMain.handle('check-uv', async () => {
   return envManager.checkUvInstalled();
@@ -150,7 +161,6 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
-
 };
 
 /**
