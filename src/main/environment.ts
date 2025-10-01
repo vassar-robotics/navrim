@@ -95,19 +95,37 @@ export class EnvironmentManager {
       throw new Error(`Unsupported platform: ${platform}`);
     }
 
-    this.log(`Installing UV with command: ${installCommand}`);
+    this.log(`Installing UV package manager...`);
+    this.log(`This is a one-time setup that may take a few minutes...`);
+    this.log(`Command: ${installCommand}`);
 
     try {
+      // For UV installation, we'll stick with execAsync but add progress messages
+      this.log(`Downloading UV installer...`);
+
       const { stdout, stderr } = await execAsync(installCommand, {
         shell: true,
         env: this.getEnhancedEnv(),
       } as any);
 
       if (stderr && !stderr.includes('warning')) {
-        this.log(`UV installation stderr: ${stderr}`);
+        this.log(`UV installation output: ${stderr}`);
       }
 
-      this.log(`UV installation stdout: ${stdout}`);
+      if (stdout) {
+        // Parse and show relevant parts of the output
+        const lines = stdout.split('\n').filter((line) => line.trim());
+        for (const line of lines) {
+          if (
+            line.includes('Installing') ||
+            line.includes('Downloading') ||
+            line.includes('Success') ||
+            line.includes('Complete')
+          ) {
+            this.log(`  ${line.trim()}`);
+          }
+        }
+      }
 
       // Verify installation succeeded
       const isInstalled = await this.checkUvInstalled();
@@ -128,7 +146,10 @@ export class EnvironmentManager {
         return;
       }
 
-      // Create virtual environment with Python 3.12
+      // Create virtual environment with Python 3.10
+      this.log(`Creating virtual environment...`);
+      this.log(`This may take a few moments...`);
+
       const { stdout, stderr } = await execAsync(
         `uv venv -p 3.10 "${this.envPath}"`,
         {
@@ -141,7 +162,7 @@ export class EnvironmentManager {
         this.log(`Create venv stderr: ${stderr}`);
       }
 
-      this.log(`Virtual environment created: ${stdout}`);
+      this.log(`✓ Virtual environment created successfully`);
     } catch (error: any) {
       this.log(`Failed to create virtual environment: ${error}`);
       throw new Error(`Failed to create virtual environment: ${error.message}`);
@@ -151,35 +172,89 @@ export class EnvironmentManager {
   async installPackage(
     packageName: string = 'navrim-phosphobot',
   ): Promise<void> {
-    try {
-      // Use uv pip install to install package in virtual environment
-      const command = `uv pip install -U ${packageName}`;
+    return new Promise((resolve, reject) => {
+      try {
+        this.log(`Installing package: ${packageName}`);
+        this.log(`This may take several minutes, please wait...`);
 
-      this.log(`Installing package: ${packageName}`);
-      this.log(`Running command: ${command}`);
+        // Use spawn for real-time output streaming
+        const args = ['pip', 'install', '-U', packageName, '-v']; // Added -v for verbose output
 
-      const { stdout, stderr } = await execAsync(command, {
-        shell: true,
-        env: {
-          ...this.getEnhancedEnv(),
-          VIRTUAL_ENV: this.envPath,
-          UV_PROJECT_ENVIRONMENT: this.envPath,
-        },
-      } as any);
+        this.log(`Running: uv ${args.join(' ')}`);
 
-      if (stdout) {
-        this.log(`Package installation output: ${stdout}`);
+        const uvProcess = spawn('uv', args, {
+          shell: true,
+          env: {
+            ...this.getEnhancedEnv(),
+            VIRTUAL_ENV: this.envPath,
+            UV_PROJECT_ENVIRONMENT: this.envPath,
+          },
+        });
+
+        let hasError = false;
+        let errorMessage = '';
+
+        uvProcess.stdout?.on('data', (data) => {
+          const output = data.toString().trim();
+          if (output) {
+            // Filter and format output for better readability
+            const lines = output.split('\n');
+            for (const line of lines) {
+              if (
+                line.includes('Downloading') ||
+                line.includes('Installing') ||
+                line.includes('Successfully') ||
+                line.includes('Collecting') ||
+                line.includes('Requirement') ||
+                line.includes('Using cached') ||
+                line.includes('Processing') ||
+                line.includes('%') || // Progress percentages
+                line.includes('━') || // Progress bars
+                line.includes('•')
+              ) {
+                // Status indicators
+                this.log(`  ${line}`);
+              }
+            }
+          }
+        });
+
+        uvProcess.stderr?.on('data', (data) => {
+          const stderr = data.toString().trim();
+          if (stderr && !stderr.includes('warning')) {
+            this.log(`  ⚠️ ${stderr}`);
+            if (stderr.includes('error') || stderr.includes('Error')) {
+              hasError = true;
+              errorMessage += stderr + '\n';
+            }
+          }
+        });
+
+        uvProcess.on('error', (error) => {
+          this.log(`Failed to start package installation: ${error.message}`);
+          reject(new Error(`Failed to install package: ${error.message}`));
+        });
+
+        uvProcess.on('close', async (code) => {
+          if (code === 0 && !hasError) {
+            this.log(`✓ Successfully installed ${packageName}`);
+            try {
+              await this.checkPackageVersion(packageName);
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          } else {
+            const message = `Package installation failed with code ${code}${errorMessage ? ': ' + errorMessage : ''}`;
+            this.log(`✗ ${message}`);
+            reject(new Error(message));
+          }
+        });
+      } catch (error: any) {
+        this.log(`Failed to install package: ${error}`);
+        reject(new Error(`Failed to install package: ${error.message}`));
       }
-
-      if (stderr && !stderr.includes('warning')) {
-        this.log(`Package installation stderr: ${stderr}`);
-      }
-
-      await this.checkPackageVersion(packageName);
-    } catch (error: any) {
-      this.log(`Failed to install package: ${error}`);
-      throw new Error(`Failed to install package: ${error.message}`);
-    }
+    });
   }
 
   async checkPackageVersion(packageName: string): Promise<void> {

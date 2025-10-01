@@ -1,5 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import logoImg from '../../assets/logo-with-text.png';
 
@@ -33,6 +33,14 @@ function EnvironmentSetup() {
   });
   const [showLogs, setShowLogs] = useState(false);
   const [logMessages, setLogMessages] = useState<string[]>([]);
+  const logEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new logs arrive
+  useEffect(() => {
+    if (showLogs && logEndRef.current) {
+      logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [logMessages, showLogs]);
 
   useEffect(() => {
     // Subscribe to log messages
@@ -365,11 +373,14 @@ function EnvironmentSetup() {
               }}
             >
               {logMessages.length > 0 ? (
-                logMessages.map((log, index) => (
-                  <div key={index} style={{ marginBottom: '4px' }}>
-                    {log}
-                  </div>
-                ))
+                <>
+                  {logMessages.map((log, index) => (
+                    <div key={index} style={{ marginBottom: '4px' }}>
+                      {log}
+                    </div>
+                  ))}
+                  <div ref={logEndRef} />
+                </>
               ) : (
                 <div style={{ color: '#666' }}>No logs yet...</div>
               )}
