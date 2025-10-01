@@ -389,25 +389,6 @@ function EnvironmentSetup() {
         )}
 
         <div></div>
-
-        {progress.error && (
-          <div
-            style={{
-              marginTop: '20px',
-              textAlign: 'center',
-              fontSize: '16px',
-              color: '#666',
-            }}
-          >
-            Need help?<br></br>Please contact us at
-            <a
-              href="mailto:support@navrim.com"
-              style={{ color: '#0066CC', textDecoration: 'none' }}
-            >
-              support@navrim.com
-            </a>
-          </div>
-        )}
       </div>
 
       <style>{`
