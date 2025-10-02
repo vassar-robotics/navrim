@@ -1,3 +1,11 @@
+# 0.4.2 (2025-10-02)
+
+## Bug Fixes
+
+- Further fixed GitHub Actions workflow by skipping postinstall scripts entirely in CI
+- Added separate step to manually run `electron-builder install-app-deps` after dependency installation
+- Prevents recursive postinstall failures when electron-builder tries to install release/app dependencies
+
 # 0.4.1 (2025-10-02)
 
 ## Bug Fixes

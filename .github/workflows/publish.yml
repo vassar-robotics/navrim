@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install --frozen-lockfile --ignore-scripts
           cd release/app
           pnpm install --frozen-lockfile --ignore-scripts
           cd ../..
