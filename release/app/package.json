@@ -1,7 +1,7 @@
 {
   "name": "navrim",
   "productName": "Navrim",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Navrim - A desktop application for phosphobot",
   "license": "MIT",
   "author": {
@@ -21,6 +21,6 @@
     "@todesktop/runtime": "^1.1.0"
   },
   "devDependencies": {
-    "electron": "^37.1.0"
+    "electron": "37.1.0"
   }
 }

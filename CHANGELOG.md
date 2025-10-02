@@ -1,3 +1,10 @@
+# 0.4.3 (2025-10-02)
+
+## Bug Fixes
+
+- Fixed ToDesktop build error by using exact Electron version (37.1.0 instead of ^37.1.0)
+- ToDesktop requires exact version numbers without semver range operators
+
 # 0.4.2 (2025-10-02)
 
 ## Bug Fixes
