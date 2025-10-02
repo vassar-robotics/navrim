@@ -168,6 +168,9 @@ const createWindow = async () => {
  */
 
 app.on('window-all-closed', () => {
+  // Clear log callback first to prevent sending to destroyed window
+  envManager.setLogCallback(null);
+
   // Stop phosphobot when closing the app
   envManager.stopPhosphobot();
 
@@ -179,6 +182,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
+  // Clear log callback first to prevent sending to destroyed window
+  envManager.setLogCallback(null);
+
   // Ensure phosphobot is stopped before quitting
   envManager.stopPhosphobot();
 });
