@@ -45,7 +45,7 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           cd release/app
-          pnpm install --frozen-lockfile
+          pnpm install --frozen-lockfile --ignore-scripts
           cd ../..
 
       - name: Build application

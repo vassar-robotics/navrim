@@ -1,3 +1,10 @@
+# 0.4.1 (2025-10-02)
+
+## Bug Fixes
+
+- Fixed GitHub Actions workflow failure during dependency installation
+- Added `--ignore-scripts` flag when installing dependencies in `release/app` to prevent postinstall script from running without dev dependencies
+
 # 0.4.0 (2025-10-02)
 
 ## Features
