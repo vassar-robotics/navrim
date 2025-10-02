@@ -5,6 +5,7 @@ import * as os from 'os';
 import * as fs from 'fs';
 import { app } from 'electron';
 import { spawn, ChildProcess } from 'child_process';
+import { kill } from 'process';
 
 const execAsync = promisify(exec);
 
@@ -323,7 +324,7 @@ export class EnvironmentManager {
 
       // Spawn phosphobot process
       const enhancedEnv = this.getEnhancedEnv();
-      this.phosphobotProcess = spawn(phosphobotPath, ['run'], {
+      this.phosphobotProcess = spawn(phosphobotPath, ['run', '--port', '8080'], {
         env: {
           ...enhancedEnv,
           VIRTUAL_ENV: this.envPath,
@@ -333,6 +334,8 @@ export class EnvironmentManager {
               : `${path.join(this.envPath, 'bin')}${path.delimiter}${enhancedEnv.PATH}`,
         },
         stdio: ['ignore', 'pipe', 'pipe'],
+        // On Unix-like systems, use process groups for better process tree management
+        ...(process.platform !== 'win32' ? { detached: false } : {}),
       });
 
       this.phosphobotProcess.stdout?.on('data', (data) => {
@@ -368,11 +371,75 @@ export class EnvironmentManager {
     }
   }
 
+  /**
+   * Kill process tree to ensure all child processes are terminated
+   */
+  private async killProcessTree(pid: number): Promise<void> {
+    try {
+      if (process.platform === 'win32') {
+        // On Windows, use taskkill to terminate process tree
+        await execAsync(`taskkill /pid ${pid} /T /F`);
+      } else {
+        // On Unix-like systems, kill the process group
+        try {
+          // Try to get child processes first
+          const { stdout } = await execAsync(`pgrep -P ${pid}`);
+          const childPids = stdout.trim().split('\n').filter(p => p);
+
+          // Kill children first
+          for (const childPid of childPids) {
+            try {
+              kill(parseInt(childPid), 'SIGKILL');
+            } catch (e) {
+              // Process might already be dead
+            }
+          }
+        } catch (e) {
+          // No children or pgrep failed, continue
+        }
+
+        // Finally kill the main process
+        try {
+          kill(pid, 'SIGKILL');
+        } catch (e) {
+          // Process might already be dead
+        }
+      }
+    } catch (error) {
+      this.log(`Error killing process tree: ${error}`);
+    }
+  }
+
   stopPhosphobot(): void {
     if (this.phosphobotProcess && !this.phosphobotProcess.killed) {
-      this.log('Stopping phosphobot process');
-      this.phosphobotProcess.kill();
-      this.phosphobotProcess = null;
+      const pid = this.phosphobotProcess.pid;
+      this.log(`Stopping phosphobot process (PID: ${pid}) gracefully`);
+
+      // Try graceful shutdown first with SIGTERM
+      try {
+        this.phosphobotProcess.kill('SIGTERM');
+      } catch (error) {
+        this.log(`Error sending SIGTERM: ${error}`);
+      }
+
+      // Set a timeout to force kill if process doesn't terminate within 5 seconds
+      const forceKillTimeout = setTimeout(async () => {
+        if (this.phosphobotProcess && !this.phosphobotProcess.killed && pid) {
+          this.log('Phosphobot did not terminate gracefully, forcing kill of entire process tree');
+          try {
+            await this.killProcessTree(pid);
+          } catch (error) {
+            this.log(`Error force killing phosphobot tree: ${error}`);
+          }
+          this.phosphobotProcess = null;
+        }
+      }, 5000);
+
+      // Clear timeout when process exits naturally
+      this.phosphobotProcess.once('exit', () => {
+        clearTimeout(forceKillTimeout);
+        this.phosphobotProcess = null;
+      });
     }
   }
 }

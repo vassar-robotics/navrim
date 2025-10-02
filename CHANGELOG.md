@@ -1,3 +1,35 @@
+# 0.4.0 (2025-10-02)
+
+## Features
+
+- Enhanced phosphobot process termination with multi-layered shutdown strategy
+- Added graceful shutdown (SIGTERM) with 5-second timeout before force kill
+- Implemented process tree termination to prevent orphaned child processes
+- Added multiple app lifecycle hooks (`window-all-closed`, `before-quit`, `will-quit`)
+- Platform-specific process killing (Unix: pgrep, Windows: taskkill)
+
+## Improvements
+
+- Changed phosphobot to use port 8080 instead of privileged port 80
+- Reduced service startup wait timeout from 180 seconds to 60 seconds
+- Added progress logging every 10 seconds during service startup
+- Improved console logging for phosphobot startup and shutdown
+- Better error messages when service fails to start
+
+## Bug Fixes
+
+- Fixed slow startup caused by port 80 permission issues on Unix systems
+- Fixed app getting stuck for 3 minutes at "Waiting for service to be ready..."
+- Ensured phosphobot is properly terminated when app closes
+
+## Documentation
+
+- Added `PHOSPHOBOT_TERMINATION.md` - Complete technical documentation
+- Added `VERIFICATION_STEPS.md` - Step-by-step testing guide
+- Added `PORT_80_FIX.md` - Explanation of port 80 issue and fix
+- Added `test-process-kill.js` - Automated test script
+- Added `scripts/check-phosphobot.sh` - Process checker utility
+
 # 2.1.0
 
 - Migrate to `css-minifier-webpack-plugin`

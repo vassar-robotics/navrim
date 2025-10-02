@@ -177,11 +177,16 @@ app.on('window-all-closed', () => {
   // }
 });
 
-app.on('before-quit', () => {
+app.on('before-quit', (event) => {
   // Clear log callback first to prevent sending to destroyed window
   envManager.setLogCallback(null);
 
   // Ensure phosphobot is stopped before quitting
+  envManager.stopPhosphobot();
+});
+
+app.on('will-quit', () => {
+  // Final safety net to ensure phosphobot is terminated
   envManager.stopPhosphobot();
 });
 

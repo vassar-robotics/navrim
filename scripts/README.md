@@ -26,11 +26,12 @@ Cleans the local development environment to simulate a fresh macOS installation.
 
 #### What it cleans
 
-- **Navrim Virtual Environment**: `~/Library/Application Support/Navrim/navrim-env`
-- **Application Caches**: 
-  - `~/Library/Application Support/Navrim/Cache`
-  - `~/Library/Application Support/Navrim/GPUCache`
-  - `~/Library/Application Support/Navrim/blob_storage`
+- **Uninstalls Navrim packages** (if possible):
+  - `navrim-phosphobot`
+  - `navrim-lerobot`
+  - `gotrue`
+- **Removes entire Navrim Application Support folder**: `~/Library/Application Support/Navrim/`
+  - This includes the virtual environment, caches, and all app data
 - **UV Package Manager** (completely removes UV installation):
   - `~/.local/bin/uv` - UV binary
   - `~/.cargo/bin/uv` - UV binary (if installed via cargo)

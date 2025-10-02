@@ -184,13 +184,21 @@ function EnvironmentSetup() {
   };
 
   const waitForService = async () => {
-    const maxAttempts = 180; // 180 seconds max wait
+    const maxAttempts = 60; // 60 seconds max wait (reduced from 180)
     let attempts = 0;
 
+    console.log('Waiting for phosphobot service on port 8080...');
+
     while (attempts < maxAttempts) {
-      const isAvailable = await checkPortAvailable(80);
+      const isAvailable = await checkPortAvailable(8080);
       if (isAvailable) {
+        console.log(`Service available after ${attempts} seconds`);
         return true;
+      }
+
+      // Log progress every 10 seconds
+      if (attempts > 0 && attempts % 10 === 0) {
+        console.log(`Still waiting for service... (${attempts}/${maxAttempts} seconds)`);
       }
 
       // Wait 1 second before next check
@@ -198,18 +206,22 @@ function EnvironmentSetup() {
       attempts++;
     }
 
+    console.error(`Service did not become available after ${maxAttempts} seconds`);
     return false;
   };
 
   const startPhosphobot = async () => {
     try {
       setProgress((prev) => ({ ...prev, startingPhosphobot: true }));
+      console.log('Starting phosphobot process...');
       const result = await window.electron.ipcRenderer.invoke('run-phosphobot');
 
       if (!result.success) {
+        console.error('Phosphobot failed to start:', result.error);
         throw new Error(result.error || 'Failed to start phosphobot');
       }
 
+      console.log('Phosphobot process started, waiting for service...');
       setProgress((prev) => ({
         ...prev,
         startingPhosphobot: false,
@@ -220,14 +232,20 @@ function EnvironmentSetup() {
       const serviceReady = await waitForService();
 
       if (!serviceReady) {
-        throw new Error('Service failed to start within 180 seconds');
+        throw new Error(
+          'Phosphobot service did not become available within 60 seconds. ' +
+          'Please check the developer console for phosphobot logs. ' +
+          'The service should be accessible at http://localhost:8080'
+        );
       }
 
+      console.log('Service ready, navigating to phosphobot...');
       setProgress((prev) => ({ ...prev, waitingForService: false }));
 
-      // Navigate to localhost:80
-      window.location.href = 'http://localhost:80';
+      // Navigate to localhost:8080
+      window.location.href = 'http://localhost:8080';
     } catch (error: any) {
+      console.error('Error in startPhosphobot:', error);
       setProgress((prev) => ({
         ...prev,
         startingPhosphobot: false,
@@ -246,7 +264,7 @@ function EnvironmentSetup() {
       return 'Installing dependencies... \n(May take a while for the first time)';
     if (progress.startingPhosphobot) return 'Starting phosphobot...';
     if (progress.waitingForService)
-      return 'Waiting for service to be ready... \n(May take a while for the first time)';
+      return 'Waiting for service to be ready... \n(This may take up to 60 seconds. Check developer console for logs.)';
     if (progress.error) return `Error: ${progress.error}`;
 
     if (status) {

@@ -97,29 +97,10 @@ echo ""
 
 FOUND_SOMETHING=false
 
-# Check Navrim virtual environment
-if check_directory "$NAVRIM_ENV" > /dev/null; then
-    size=$(check_directory "$NAVRIM_ENV")
-    print_info "Found Navrim virtual environment: $NAVRIM_ENV (${size})"
-    FOUND_SOMETHING=true
-fi
-
-# Check Navrim caches
-if check_directory "$NAVRIM_CACHE" > /dev/null; then
-    size=$(check_directory "$NAVRIM_CACHE")
-    print_info "Found Navrim cache: $NAVRIM_CACHE (${size})"
-    FOUND_SOMETHING=true
-fi
-
-if check_directory "$NAVRIM_GPU_CACHE" > /dev/null; then
-    size=$(check_directory "$NAVRIM_GPU_CACHE")
-    print_info "Found Navrim GPU cache: $NAVRIM_GPU_CACHE (${size})"
-    FOUND_SOMETHING=true
-fi
-
-if check_directory "$NAVRIM_BLOB_STORAGE" > /dev/null; then
-    size=$(check_directory "$NAVRIM_BLOB_STORAGE")
-    print_info "Found Navrim blob storage: $NAVRIM_BLOB_STORAGE (${size})"
+# Check Navrim application support folder
+if check_directory "$NAVRIM_APP_SUPPORT" > /dev/null; then
+    size=$(check_directory "$NAVRIM_APP_SUPPORT")
+    print_info "Found Navrim application support folder: $NAVRIM_APP_SUPPORT (${size})"
     FOUND_SOMETHING=true
 fi
 
@@ -167,15 +148,19 @@ if [ "$DRY_RUN" = true ]; then
     print_warning "DRY RUN MODE - Nothing will be deleted"
     echo ""
     echo "The following would be removed:"
-    [ -d "$NAVRIM_ENV" ] && echo "  - $NAVRIM_ENV"
-    [ -d "$NAVRIM_CACHE" ] && echo "  - $NAVRIM_CACHE/*"
-    [ -d "$NAVRIM_GPU_CACHE" ] && echo "  - $NAVRIM_GPU_CACHE/*"
-    [ -d "$NAVRIM_BLOB_STORAGE" ] && echo "  - $NAVRIM_BLOB_STORAGE/*"
+    [ -d "$NAVRIM_APP_SUPPORT" ] && echo "  - $NAVRIM_APP_SUPPORT (entire folder)"
     [ -f "$UV_BIN" ] && echo "  - $UV_BIN"
     [ -f "$CARGO_UV" ] && echo "  - $CARGO_UV"
     [ -d "$UV_TOOL" ] && echo "  - $UV_TOOL"
     [ -d "$UV_CACHE" ] && echo "  - $UV_CACHE"
     echo ""
+    if [ -d "$NAVRIM_ENV" ]; then
+        echo "Additionally, will attempt to uninstall:"
+        echo "  - navrim-phosphobot package"
+        echo "  - navrim-lerobot package"
+        echo "  - gotrue package"
+        echo ""
+    fi
     print_info "Run without --dry-run to actually clean"
     exit 0
 fi
@@ -197,30 +182,26 @@ fi
 echo ""
 print_info "Starting cleanup..."
 
-# Remove Navrim virtual environment
+# First, try to uninstall phosphobot and lerobot packages if virtual environment exists
 if [ -d "$NAVRIM_ENV" ]; then
-    print_info "Removing Navrim virtual environment..."
-    rm -rf "$NAVRIM_ENV"
-    print_success "Removed: $NAVRIM_ENV"
+    print_info "Attempting to uninstall phosphobot and lerobot packages..."
+
+    # Check if uv is available
+    if command -v uv &> /dev/null; then
+        # Try to uninstall packages using uv
+        UV_PROJECT_ENVIRONMENT="$NAVRIM_ENV" uv pip uninstall navrim-phosphobot navrim-lerobot gotrue -y 2>/dev/null && \
+            print_success "Uninstalled navrim packages" || \
+            print_warning "Could not uninstall packages (environment may be corrupted)"
+    else
+        print_warning "UV not found, skipping package uninstall"
+    fi
 fi
 
-# Clear cache directories
-if [ -d "$NAVRIM_CACHE" ]; then
-    print_info "Clearing Navrim cache..."
-    rm -rf "$NAVRIM_CACHE"/*
-    print_success "Cleared: $NAVRIM_CACHE"
-fi
-
-if [ -d "$NAVRIM_GPU_CACHE" ]; then
-    print_info "Clearing Navrim GPU cache..."
-    rm -rf "$NAVRIM_GPU_CACHE"/*
-    print_success "Cleared: $NAVRIM_GPU_CACHE"
-fi
-
-if [ -d "$NAVRIM_BLOB_STORAGE" ]; then
-    print_info "Clearing Navrim blob storage..."
-    rm -rf "$NAVRIM_BLOB_STORAGE"/*
-    print_success "Cleared: $NAVRIM_BLOB_STORAGE"
+# Remove entire Navrim application support folder
+if [ -d "$NAVRIM_APP_SUPPORT" ]; then
+    print_info "Removing entire Navrim application support folder..."
+    rm -rf "$NAVRIM_APP_SUPPORT"
+    print_success "Removed: $NAVRIM_APP_SUPPORT"
 fi
 
 # Remove UV package manager

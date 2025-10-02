@@ -1,6 +1,6 @@
 {
   "name": "navrim",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Navrim - A desktop application for phosphobot",
   "keywords": [
     "navrim",
@@ -98,7 +98,7 @@
     }
   },
   "dependencies": {
-    "@copilotkit/runtime": "^1.9.1",
+    "@copilotkit/runtime": "^1.10.5",
     "@electron/notarize": "3.0.0",
     "@todesktop/runtime": "^2.1.3",
     "electron-debug": "^4.1.0",

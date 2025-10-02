@@ -18,7 +18,7 @@ export class CopilotKitServer {
   constructor() {
     this.runtime = new CopilotRuntime({
       remoteEndpoints: [
-        { url: 'http://localhost:80/chat/tools' }
+        { url: 'http://localhost:8080/chat/tools' }
       ],
     });
     this.openai = new OpenAI({ apiKey: this.readOpenAIApiKey() });
