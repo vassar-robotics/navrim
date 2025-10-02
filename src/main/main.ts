@@ -131,12 +131,8 @@ const createWindow = async () => {
     },
   });
 
-  // Load from localhost:80
-  mainWindow.loadURL('http://localhost:80').catch((err) => {
-    console.error('Failed to load localhost:80:', err);
-    // Fallback to loading the bundled index.html if the server is not running
-    mainWindow?.loadURL(resolveHtmlPath('index.html'));
-  });
+  // Start by loading the bundled index.html which will handle setup
+  mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
